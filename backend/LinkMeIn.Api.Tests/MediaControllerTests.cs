@@ -11,6 +11,15 @@ namespace LinkMeIn.Api.Tests
 {
     public class MediaControllerTests : IClassFixture<CustomWebApplicationFactory<Program>>
     {
+        [Fact]
+        public async Task GetMedia_NonExistentPost_Returns404()
+        {
+            await _factory.ResetDatabaseAsync();
+            var client = CreateClient();
+            var randomPostId = Guid.NewGuid();
+            var resp = await client.GetAsync($"/api/posts/{randomPostId}/media");
+            Assert.Equal(HttpStatusCode.NotFound, resp.StatusCode);
+        }
         private readonly CustomWebApplicationFactory<Program> _factory;
         public MediaControllerTests(CustomWebApplicationFactory<Program> factory)
         {
