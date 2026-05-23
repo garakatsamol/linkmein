@@ -15,6 +15,29 @@ namespace LinkMeIn.Api.Tests
     public class PostsControllerTests : IClassFixture<CustomWebApplicationFactory<Program>>
     {
         [Fact]
+        public async Task DeletePost_ValidRequest_RemovesPost()
+        {
+            var client = CreateClient();
+            // Create a post
+            var createRequest = new LinkMeIn.Api.Contracts.Posts.CreatePostRequest
+            {
+                Title = "Delete Me",
+                Content = "To be deleted"
+            };
+            var createResp = await client.PostAsJsonAsync("/api/posts", createRequest);
+            Assert.Equal(HttpStatusCode.Created, createResp.StatusCode);
+            var createdPost = await createResp.Content.ReadFromJsonAsync<LinkMeIn.Api.Contracts.Posts.PostDto>();
+            Assert.NotNull(createdPost);
+
+            // Delete the post
+            var deleteResp = await client.DeleteAsync($"/api/posts/{createdPost.Id}");
+            Assert.Equal(HttpStatusCode.NoContent, deleteResp.StatusCode);
+
+            // Try to get the deleted post
+            var getResp = await client.GetAsync($"/api/posts/{createdPost.Id}");
+            Assert.Equal(HttpStatusCode.NotFound, getResp.StatusCode);
+        }
+        [Fact]
         public async Task UpdatePost_ValidRequest_Returns200AndUpdatedPost()
         {
             var client = CreateClient();
