@@ -52,5 +52,27 @@ namespace LinkMeIn.Api.Tests
             Assert.Equal("Draft", post.Status);
             Assert.NotEqual(Guid.Empty, post.Id);
         }
+
+        [Fact]
+        public async Task CreateScheduledPost_ValidRequest_Returns201AndScheduledPostDto()
+        {
+            var client = CreateClient();
+            var futureDate = DateTimeOffset.UtcNow.AddDays(1);
+            var request = new LinkMeIn.Api.Contracts.Posts.CreatePostRequest
+            {
+                Title = "Scheduled Title",
+                Content = "Scheduled Content",
+                ScheduledFor = futureDate
+            };
+            var resp = await client.PostAsJsonAsync("/api/posts", request);
+            Assert.Equal(HttpStatusCode.Created, resp.StatusCode);
+            var post = await resp.Content.ReadFromJsonAsync<LinkMeIn.Api.Contracts.Posts.PostDto>();
+            Assert.NotNull(post);
+            Assert.Equal(request.Title, post.Title);
+            Assert.Equal(request.Content, post.Content);
+            Assert.Equal("Scheduled", post.Status);
+            Assert.NotNull(post.ScheduledFor);
+            Assert.NotEqual(Guid.Empty, post.Id);
+        }
     }
 }
