@@ -12,6 +12,35 @@ namespace LinkMeIn.Api.Tests
     public class MediaControllerTests : IClassFixture<CustomWebApplicationFactory<Program>>
     {
         [Fact]
+        public async Task UploadMedia_InvalidContentType_Returns400()
+        {
+            await _factory.ResetDatabaseAsync();
+            var client = CreateClient();
+
+            // Create a post
+            var createRequest = new LinkMeIn.Api.Contracts.Posts.CreatePostRequest
+            {
+                Title = "Test Post Invalid ContentType",
+                Content = "Test Content"
+            };
+            var createResp = await client.PostAsJsonAsync("/api/posts", createRequest);
+            Assert.Equal(HttpStatusCode.Created, createResp.StatusCode);
+            var createdPost = await createResp.Content.ReadFromJsonAsync<LinkMeIn.Api.Contracts.Posts.PostDto>();
+            Assert.NotNull(createdPost);
+
+            // Create a fake text file in memory
+            var fileBytes = System.Text.Encoding.UTF8.GetBytes("This is not an image.");
+            var fileContent = new ByteArrayContent(fileBytes);
+            fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("text/plain");
+
+            var form = new MultipartFormDataContent();
+            form.Add(fileContent, "file", "test.txt");
+
+            // Upload file with invalid content type
+            var uploadResp = await client.PostAsync($"/api/posts/{createdPost.Id}/media", form);
+            Assert.Equal(HttpStatusCode.BadRequest, uploadResp.StatusCode);
+        }
+        [Fact]
         public async Task GetMedia_NonExistentPost_Returns404()
         {
             await _factory.ResetDatabaseAsync();
