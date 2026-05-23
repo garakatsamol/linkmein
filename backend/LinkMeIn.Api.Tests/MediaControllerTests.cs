@@ -12,6 +12,57 @@ namespace LinkMeIn.Api.Tests
     public class MediaControllerTests : IClassFixture<CustomWebApplicationFactory<Program>>
     {
         [Fact]
+        public async Task UploadMedia_ExceedsMaxImages_Returns400()
+        {
+            await _factory.ResetDatabaseAsync();
+            var client = CreateClient();
+
+            // Create a post
+            var createRequest = new LinkMeIn.Api.Contracts.Posts.CreatePostRequest
+            {
+                Title = "Test Post Max Images",
+                Content = "Test Content"
+            };
+            var createResp = await client.PostAsJsonAsync("/api/posts", createRequest);
+            Assert.Equal(HttpStatusCode.Created, createResp.StatusCode);
+            var createdPost = await createResp.Content.ReadFromJsonAsync<LinkMeIn.Api.Contracts.Posts.PostDto>();
+            Assert.NotNull(createdPost);
+
+            // Helper to create a small valid PNG image
+            byte[] MakePng(int uniqueByte) => new byte[] {
+                0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A,
+                0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52,
+                0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
+                0x08, 0x06, 0x00, 0x00, 0x00, (byte)uniqueByte, 0x15, 0xC4,
+                0x89, 0x00, 0x00, 0x00, 0x0A, 0x49, 0x44, 0x41,
+                0x54, 0x78, 0x9C, 0x63, 0x60, 0x00, 0x00, 0x00,
+                0x02, 0x00, 0x01, 0xE2, 0x21, 0xBC, 0x33, 0x00,
+                0x00, 0x00, 0x00, 0x49, 0x45, 0x4E, 0x44, 0xAE,
+                0x42, 0x60, 0x82
+            };
+
+            // Upload 4 valid images (should succeed)
+            for (int i = 0; i < 4; i++)
+            {
+                var imageBytes = MakePng(i);
+                var imageContent = new ByteArrayContent(imageBytes);
+                imageContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/png");
+                var form = new MultipartFormDataContent();
+                form.Add(imageContent, "file", $"img{i}.png");
+                var uploadResp = await client.PostAsync($"/api/posts/{createdPost.Id}/media", form);
+                Assert.Equal(HttpStatusCode.Created, uploadResp.StatusCode);
+            }
+
+            // Upload 5th image (should fail)
+            var fifthImageBytes = MakePng(99);
+            var fifthImageContent = new ByteArrayContent(fifthImageBytes);
+            fifthImageContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/png");
+            var fifthForm = new MultipartFormDataContent();
+            fifthForm.Add(fifthImageContent, "file", "img5.png");
+            var fifthUploadResp = await client.PostAsync($"/api/posts/{createdPost.Id}/media", fifthForm);
+            Assert.Equal(HttpStatusCode.BadRequest, fifthUploadResp.StatusCode);
+        }
+        [Fact]
         public async Task UploadMedia_OversizedImage_Returns400()
         {
             await _factory.ResetDatabaseAsync();
