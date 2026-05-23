@@ -3,6 +3,7 @@ import { Component, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
+import { MessageModule } from 'primeng/message';
 import { TagModule } from 'primeng/tag';
 import { BehaviorSubject, Observable, combineLatest, map } from 'rxjs';
 
@@ -27,7 +28,7 @@ interface CalendarView {
 
 @Component({
   selector: 'app-post-calendar',
-  imports: [AsyncPipe, ButtonModule, CardModule, DatePipe, RouterLink, TagModule],
+  imports: [AsyncPipe, ButtonModule, CardModule, DatePipe, MessageModule, RouterLink, TagModule],
   templateUrl: './post-calendar.component.html',
   styleUrl: './post-calendar.component.scss'
 })
@@ -76,6 +77,10 @@ export class PostCalendarComponent {
     }
 
     return status === 'scheduled' ? 'warn' : 'info';
+  }
+
+  protected hasVisiblePosts(days: CalendarDay[]): boolean {
+    return days.some((day) => day.posts.length > 0);
   }
 
   private buildCalendarView(drafts: PostDraft[], currentMonth: Date, filter: StatusFilter): CalendarView {

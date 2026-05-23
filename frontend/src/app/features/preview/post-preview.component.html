@@ -10,7 +10,7 @@
 </div>
 
 @if (draft$ | async; as draft) {
-  <p-message severity="info" text="Sandbox only — not posted to LinkedIn." />
+  <p-message severity="info" text="Sandbox only - Not posted to LinkedIn." />
 
   @if (feedback) {
     <p-message severity="success" [text]="feedback" />
@@ -21,7 +21,7 @@
   }
 
   @if (draft.mockPublishedAt) {
-    <p-message severity="success" [text]="'Sandbox published ' + (draft.mockPublishedAt | date: 'medium') + '. This was not posted to LinkedIn.'" />
+    <p-message severity="success" [text]="'Sandbox published ' + (draft.mockPublishedAt | date: 'medium') + '. Not posted to LinkedIn.'" />
   }
 
   <div class="publish-actions">

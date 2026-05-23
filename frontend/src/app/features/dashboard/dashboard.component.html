@@ -13,7 +13,12 @@
 
 <p-message
   severity="info"
-  text="Phase 1 is local-only. Sandbox publishing is not posted to LinkedIn."
+  text="Phase 1 is local-only. Drafts are stored only in this browser; clearing browser storage may remove them."
+/>
+
+<p-message
+  severity="secondary"
+  text="Sandbox publish is not posted to LinkedIn. Cloud storage and database persistence require a future backend."
 />
 
 @if (view$ | async; as view) {
@@ -37,7 +42,7 @@
 
     @if (view.featuredPosts.length === 0) {
       <div class="empty-state">
-        <p>No drafts yet.</p>
+        <p>No drafts yet. Start with a local draft, then preview and sandbox publish it when ready.</p>
         <a pButton routerLink="/composer" label="Create draft" icon="pi pi-plus"></a>
       </div>
     } @else {

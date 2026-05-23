@@ -14,13 +14,13 @@
   <p-message severity="error" [text]="publishError" />
 }
 
-<p-message severity="info" text="Sandbox only — not posted to LinkedIn." />
+<p-message severity="info" text="Sandbox only - Not posted to LinkedIn. Drafts are stored only in this browser." />
 
 @if (drafts$ | async; as drafts) {
   @if (drafts.length === 0) {
-    <p-card styleClass="empty-state">
-      <ng-template pTemplate="title">No drafts yet</ng-template>
-      <p>Create your first local draft to start shaping a post.</p>
+      <p-card styleClass="empty-state">
+        <ng-template pTemplate="title">No drafts yet</ng-template>
+      <p>Create your first local draft to start shaping a post. Drafts are stored only in this browser.</p>
       <a pButton routerLink="/composer" label="Create draft" icon="pi pi-plus"></a>
     </p-card>
   } @else {

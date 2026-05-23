@@ -1,12 +1,14 @@
 <div class="page-actions">
   <div>
     <h2>Calendar</h2>
-    <p>Plan and review local drafts by month.</p>
+    <p>Plan and review local drafts by month. Dates are local to this browser.</p>
   </div>
   <a pButton routerLink="/composer" label="New draft" icon="pi pi-plus"></a>
 </div>
 
 @if (view$ | async; as view) {
+  <p-message severity="info" text="Drafts are stored only in this browser. Clearing browser storage may remove them." />
+
   <div class="calendar-toolbar">
     <div class="month-controls">
       <button pButton type="button" icon="pi pi-chevron-left" severity="secondary" outlined aria-label="Previous month" (click)="previousMonth()"></button>
@@ -64,11 +66,18 @@
     }
   </div>
 
+  @if (!hasVisiblePosts(view.days)) {
+    <p-card styleClass="calendar-empty-state">
+      <ng-template pTemplate="title">No posts in this calendar view</ng-template>
+      <p>Create a draft for a day or adjust the status filter.</p>
+    </p-card>
+  }
+
   <p-card styleClass="upcoming-card">
     <ng-template pTemplate="title">Upcoming scheduled posts</ng-template>
 
     @if (view.upcomingPosts.length === 0) {
-      <p class="empty-copy">No scheduled posts from today onward.</p>
+      <p class="empty-copy">No scheduled posts from today onward. Use a day action or Composer to set a scheduled date.</p>
     } @else {
       <div class="upcoming-list">
         @for (post of view.upcomingPosts; track post.id) {
