@@ -7,12 +7,11 @@ import { providePrimeNG } from 'primeng/config';
 
 import { routes } from './app.routes';
 import { API_BASE_URL, DEFAULT_API_BASE_URL } from './core/api/api.config';
-import { DraftStoreService } from './core/services/draft-store.service';
 import { ImagePreviewService } from './core/services/image-preview.service';
-import { LocalDraftStoreService } from './core/services/local-draft-store.service';
 import { LocalImagePreviewService } from './core/services/local-image-preview.service';
 import { MockPublisherService } from './core/services/mock-publisher.service';
 import { PublisherService } from './core/services/publisher.service';
+import { provideDraftStoreForStorageMode } from './core/storage/storage-mode.config';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -21,7 +20,8 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync(),
     provideRouter(routes),
     { provide: API_BASE_URL, useValue: DEFAULT_API_BASE_URL },
-    { provide: DraftStoreService, useExisting: LocalDraftStoreService },
+    // Switch to provideDraftStoreForStorageMode('api') during backend API development.
+    provideDraftStoreForStorageMode(),
     { provide: ImagePreviewService, useExisting: LocalImagePreviewService },
     { provide: PublisherService, useExisting: MockPublisherService },
     providePrimeNG({
