@@ -18,6 +18,17 @@ namespace LinkMeIn.Api.Controllers
             _db = db;
         }
 
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            var post = await _db.Posts.FirstOrDefaultAsync(p => p.Id == id && p.OwnerId == DefaultOwnerId);
+            if (post == null)
+                return NotFound();
+            _db.Posts.Remove(post);
+            await _db.SaveChangesAsync();
+            return NoContent();
+        }
+
         [HttpPut("{id}")]
         public async Task<ActionResult<PostDto>> Update(Guid id, [FromBody] UpdatePostRequest req)
         {
