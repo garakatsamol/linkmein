@@ -15,6 +15,36 @@ namespace LinkMeIn.Api.Tests
     public class PostsControllerTests : IClassFixture<CustomWebApplicationFactory<Program>>
     {
         [Fact]
+        public async Task UpdatePost_ValidRequest_Returns200AndUpdatedPost()
+        {
+            var client = CreateClient();
+            // Create a post
+            var createRequest = new LinkMeIn.Api.Contracts.Posts.CreatePostRequest
+            {
+                Title = "Original Title",
+                Content = "Original Content"
+            };
+            var createResp = await client.PostAsJsonAsync("/api/posts", createRequest);
+            Assert.Equal(HttpStatusCode.Created, createResp.StatusCode);
+            var createdPost = await createResp.Content.ReadFromJsonAsync<LinkMeIn.Api.Contracts.Posts.PostDto>();
+            Assert.NotNull(createdPost);
+
+            // Update the post
+            var updateRequest = new LinkMeIn.Api.Contracts.Posts.UpdatePostRequest
+            {
+                Title = "Updated Title",
+                Content = "Updated Content"
+            };
+            var updateResp = await client.PutAsJsonAsync($"/api/posts/{createdPost.Id}", updateRequest);
+            Assert.Equal(HttpStatusCode.OK, updateResp.StatusCode);
+            var updatedPost = await updateResp.Content.ReadFromJsonAsync<LinkMeIn.Api.Contracts.Posts.PostDto>();
+            Assert.NotNull(updatedPost);
+            Assert.Equal(createdPost.Id, updatedPost.Id);
+            Assert.Equal(updateRequest.Title, updatedPost.Title);
+            Assert.Equal(updateRequest.Content, updatedPost.Content);
+            Assert.Equal("Draft", updatedPost.Status);
+        }
+        [Fact]
         public async Task GetPostById_NotFound_Returns404()
         {
             var client = CreateClient();
