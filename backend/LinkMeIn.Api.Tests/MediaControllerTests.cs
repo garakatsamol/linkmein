@@ -12,6 +12,59 @@ namespace LinkMeIn.Api.Tests
     public class MediaControllerTests : IClassFixture<CustomWebApplicationFactory<Program>>
     {
         [Fact]
+        public async Task DeleteMedia_MediaBelongsToDifferentPost_Returns404()
+        {
+            await _factory.ResetDatabaseAsync();
+            var client = CreateClient();
+
+            // Create post A
+            var createRequestA = new LinkMeIn.Api.Contracts.Posts.CreatePostRequest
+            {
+                Title = "Post A",
+                Content = "Content A"
+            };
+            var createRespA = await client.PostAsJsonAsync("/api/posts", createRequestA);
+            Assert.Equal(HttpStatusCode.Created, createRespA.StatusCode);
+            var postA = await createRespA.Content.ReadFromJsonAsync<LinkMeIn.Api.Contracts.Posts.PostDto>();
+            Assert.NotNull(postA);
+
+            // Create post B
+            var createRequestB = new LinkMeIn.Api.Contracts.Posts.CreatePostRequest
+            {
+                Title = "Post B",
+                Content = "Content B"
+            };
+            var createRespB = await client.PostAsJsonAsync("/api/posts", createRequestB);
+            Assert.Equal(HttpStatusCode.Created, createRespB.StatusCode);
+            var postB = await createRespB.Content.ReadFromJsonAsync<LinkMeIn.Api.Contracts.Posts.PostDto>();
+            Assert.NotNull(postB);
+
+            // Upload a valid image to post A
+            var imageBytes = new byte[] {
+                0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, // PNG header
+                0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52,
+                0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
+                0x08, 0x06, 0x00, 0x00, 0x00, 0x1F, 0x15, 0xC4,
+                0x89, 0x00, 0x00, 0x00, 0x0A, 0x49, 0x44, 0x41,
+                0x54, 0x78, 0x9C, 0x63, 0x60, 0x00, 0x00, 0x00,
+                0x02, 0x00, 0x01, 0xE2, 0x21, 0xBC, 0x33, 0x00,
+                0x00, 0x00, 0x00, 0x49, 0x45, 0x4E, 0x44, 0xAE,
+                0x42, 0x60, 0x82
+            };
+            var imageContent = new ByteArrayContent(imageBytes);
+            imageContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/png");
+            var form = new MultipartFormDataContent();
+            form.Add(imageContent, "file", "test.png");
+            var uploadResp = await client.PostAsync($"/api/posts/{postA.Id}/media", form);
+            Assert.Equal(HttpStatusCode.Created, uploadResp.StatusCode);
+            var mediaDto = await uploadResp.Content.ReadFromJsonAsync<LinkMeIn.Api.Contracts.Media.PostMediaDto>();
+            Assert.NotNull(mediaDto);
+
+            // Attempt to delete media from post B (should return 404)
+            var deleteResp = await client.DeleteAsync($"/api/posts/{postB.Id}/media/{mediaDto.Id}");
+            Assert.Equal(HttpStatusCode.NotFound, deleteResp.StatusCode);
+        }
+        [Fact]
         public async Task DeleteMedia_NonExistentMedia_Returns404()
         {
             await _factory.ResetDatabaseAsync();
