@@ -6,6 +6,9 @@ using LinkMeIn.Api.Contracts.Media;
 using LinkMeIn.Api.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using LinkMeIn.Api.Options;
+using LinkMeIn.Api.Services;
+using Microsoft.Extensions.Options;
 
 namespace LinkMeIn.Api.Controllers
 {
@@ -14,11 +17,74 @@ namespace LinkMeIn.Api.Controllers
     public class MediaController : ControllerBase
     {
         private readonly LinkMeInDbContext _db;
+        private readonly IMediaStorageService _mediaStorage;
+        private readonly MediaStorageOptions _mediaOptions;
         private const string DefaultOwnerId = "default-owner";
 
-        public MediaController(LinkMeInDbContext db)
+        public MediaController(LinkMeInDbContext db, IMediaStorageService mediaStorage, Microsoft.Extensions.Options.IOptions<MediaStorageOptions> mediaOptions)
         {
             _db = db;
+            _mediaStorage = mediaStorage;
+            _mediaOptions = mediaOptions.Value;
+        }
+        [HttpPost]
+        public async Task<ActionResult<PostMediaDto>> UploadMedia(Guid postId, [FromForm] Microsoft.AspNetCore.Http.IFormFile file)
+        {
+            // Find post
+            var post = await _db.Posts.FirstOrDefaultAsync(p => p.Id == postId && p.OwnerId == DefaultOwnerId);
+            if (post == null)
+                return NotFound();
+
+            // Validate file present
+            if (file == null || file.Length == 0)
+                return BadRequest("File is required.");
+
+            // Validate content type
+            if (!_mediaOptions.AllowedContentTypes.Contains(file.ContentType))
+                return BadRequest($"Content type '{file.ContentType}' is not allowed.");
+
+            // Validate file size
+            if (file.Length > _mediaOptions.MaxFileSizeBytes)
+                return BadRequest($"File size exceeds maximum of {_mediaOptions.MaxFileSizeBytes} bytes.");
+
+            // Validate max images per post
+            var mediaCount = await _db.PostMedia.CountAsync(m => m.PostId == postId);
+            if (mediaCount >= _mediaOptions.MaxImagesPerPost)
+                return BadRequest($"Maximum of {_mediaOptions.MaxImagesPerPost} images per post exceeded.");
+
+            // Save file
+            string storagePath;
+            using (var stream = file.OpenReadStream())
+            {
+                storagePath = await _mediaStorage.SaveFileAsync(postId.ToString(), file.FileName, stream, file.ContentType);
+            }
+
+            // Create PostMedia record
+            var postMedia = new Entities.PostMedia
+            {
+                Id = Guid.NewGuid(),
+                PostId = postId,
+                OwnerId = DefaultOwnerId,
+                FileName = file.FileName,
+                ContentType = file.ContentType,
+                SizeBytes = file.Length,
+                StoragePath = storagePath,
+                CreatedAt = DateTimeOffset.UtcNow
+            };
+            _db.PostMedia.Add(postMedia);
+            await _db.SaveChangesAsync();
+
+            var dto = new PostMediaDto
+            {
+                Id = postMedia.Id,
+                PostId = postMedia.PostId,
+                FileName = postMedia.FileName,
+                ContentType = postMedia.ContentType,
+                SizeBytes = postMedia.SizeBytes,
+                CreatedAt = postMedia.CreatedAt,
+                LinkedInAssetUrn = postMedia.LinkedInAssetUrn
+            };
+            return CreatedAtAction(nameof(GetMedia), new { postId }, dto);
         }
 
         [HttpGet]
