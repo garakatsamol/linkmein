@@ -12,8 +12,20 @@ using Xunit;
 
 namespace LinkMeIn.Api.Tests
 {
-    public class PostsControllerTests : IClassFixture<CustomWebApplicationFactory<Program>>
-    {
+        public class PostsControllerTests : IClassFixture<CustomWebApplicationFactory<Program>>
+        {
+            [Fact]
+            public async Task CreatePost_MissingContent_Returns400BadRequest()
+            {
+                var client = CreateClient();
+                var request = new LinkMeIn.Api.Contracts.Posts.CreatePostRequest
+                {
+                    Title = "Valid Title",
+                    Content = ""
+                };
+                var resp = await client.PostAsJsonAsync("/api/posts", request);
+                Assert.Equal(HttpStatusCode.BadRequest, resp.StatusCode);
+            }
         [Fact]
         public async Task CreatePost_MissingTitle_Returns400BadRequest()
         {
