@@ -1,0 +1,90 @@
+<div class="page-actions">
+  <div>
+    <h2>Calendar</h2>
+    <p>Plan and review local drafts by month.</p>
+  </div>
+  <a pButton routerLink="/composer" label="New draft" icon="pi pi-plus"></a>
+</div>
+
+@if (view$ | async; as view) {
+  <div class="calendar-toolbar">
+    <div class="month-controls">
+      <button pButton type="button" icon="pi pi-chevron-left" severity="secondary" outlined aria-label="Previous month" (click)="previousMonth()"></button>
+      <h3>{{ view.monthLabel }}</h3>
+      <button pButton type="button" icon="pi pi-chevron-right" severity="secondary" outlined aria-label="Next month" (click)="nextMonth()"></button>
+    </div>
+
+    @if (selectedFilter$ | async; as selectedFilter) {
+      <div class="status-filters" aria-label="Status filters">
+        @for (filter of statusFilters; track filter.value) {
+          <button
+            pButton
+            type="button"
+            [label]="filter.label"
+            severity="secondary"
+            [class.active-filter]="selectedFilter === filter.value"
+            [outlined]="selectedFilter !== filter.value"
+            (click)="setFilter(filter.value)"
+          ></button>
+        }
+      </div>
+    }
+  </div>
+
+  <div class="calendar-grid">
+    @for (label of weekdayLabels; track label) {
+      <div class="weekday">{{ label }}</div>
+    }
+
+    @for (day of view.days; track day.dateKey) {
+      <article class="day-cell" [class.muted]="!day.inCurrentMonth" [class.today]="day.isToday">
+        <div class="day-header">
+          <span>{{ day.date | date: 'd' }}</span>
+          <button
+            pButton
+            type="button"
+            icon="pi pi-plus"
+            severity="secondary"
+            text
+            rounded
+            aria-label="New draft for this day"
+            (click)="createDraftForDay(day.date)"
+          ></button>
+        </div>
+
+        <div class="day-posts">
+          @for (post of day.posts; track post.id) {
+            <a class="post-chip" [routerLink]="['/posts', post.id, 'preview']">
+              <span>{{ post.title }}</span>
+              <p-tag [value]="post.status" [severity]="getSeverity(post.status)" />
+            </a>
+          }
+        </div>
+      </article>
+    }
+  </div>
+
+  <p-card styleClass="upcoming-card">
+    <ng-template pTemplate="title">Upcoming scheduled posts</ng-template>
+
+    @if (view.upcomingPosts.length === 0) {
+      <p class="empty-copy">No scheduled posts from today onward.</p>
+    } @else {
+      <div class="upcoming-list">
+        @for (post of view.upcomingPosts; track post.id) {
+          <article class="upcoming-row">
+            <div>
+              <h4>{{ post.title }}</h4>
+              <p>{{ post.scheduledFor | date: 'medium' }}</p>
+            </div>
+            <p-tag [value]="post.status" [severity]="getSeverity(post.status)" />
+            <div class="row-actions">
+              <a pButton [routerLink]="['/posts', post.id, 'preview']" label="Preview" icon="pi pi-eye" severity="secondary" outlined></a>
+              <a pButton [routerLink]="['/composer', post.id]" label="Edit" icon="pi pi-pencil" severity="secondary"></a>
+            </div>
+          </article>
+        }
+      </div>
+    }
+  </p-card>
+}

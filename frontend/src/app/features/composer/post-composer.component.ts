@@ -48,6 +48,12 @@ export class PostComposerComponent implements OnInit {
     this.draftId = this.route.snapshot.paramMap.get('id');
 
     if (!this.draftId) {
+      const scheduledFor = this.route.snapshot.queryParamMap.get('scheduledFor');
+
+      if (scheduledFor) {
+        this.form.patchValue({ scheduledFor: this.toDateTimeLocalValue(scheduledFor) });
+      }
+
       return;
     }
 
@@ -142,5 +148,18 @@ export class PostComposerComponent implements OnInit {
       scheduledFor: draft.scheduledFor ?? ''
     });
     this.images = draft.images;
+  }
+
+  private toDateTimeLocalValue(value: string): string {
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+      return value;
+    }
+
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(
+      2,
+      '0'
+    )}T${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
   }
 }

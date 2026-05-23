@@ -18,6 +18,11 @@ export const routes: Routes = [
           import('./features/dashboard/dashboard.component').then((m) => m.DashboardComponent)
       },
       {
+        path: 'calendar',
+        loadComponent: () =>
+          import('./features/calendar/post-calendar.component').then((m) => m.PostCalendarComponent)
+      },
+      {
         path: 'posts',
         loadComponent: () =>
           import('./features/posts/post-list.component').then((m) => m.PostListComponent)

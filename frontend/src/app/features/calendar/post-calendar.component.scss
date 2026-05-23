@@ -1,0 +1,157 @@
+:host {
+  display: grid;
+  gap: 1rem;
+}
+
+.page-actions,
+.calendar-toolbar,
+.month-controls,
+.status-filters,
+.upcoming-row,
+.row-actions {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.page-actions,
+.calendar-toolbar,
+.upcoming-row {
+  justify-content: space-between;
+}
+
+h2,
+h3,
+h4,
+p {
+  margin: 0;
+}
+
+.page-actions p,
+.empty-copy,
+.upcoming-row p {
+  color: var(--text-color-secondary);
+}
+
+.calendar-toolbar {
+  flex-wrap: wrap;
+}
+
+.month-controls h3 {
+  min-width: 12rem;
+  text-align: center;
+}
+
+.status-filters {
+  flex-wrap: wrap;
+}
+
+.active-filter {
+  box-shadow: 0 0 0 1px var(--primary-color);
+}
+
+.calendar-grid {
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.weekday {
+  color: var(--text-color-secondary);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  padding: 0 0.25rem;
+  text-transform: uppercase;
+}
+
+.day-cell {
+  background: var(--surface-card);
+  border: 1px solid var(--surface-border);
+  border-radius: 0.5rem;
+  display: grid;
+  gap: 0.5rem;
+  min-height: 9rem;
+  padding: 0.5rem;
+}
+
+.day-cell.muted {
+  opacity: 0.55;
+}
+
+.day-cell.today {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 1px var(--primary-color);
+}
+
+.day-header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.day-header span {
+  font-weight: 700;
+}
+
+.day-posts {
+  display: grid;
+  gap: 0.375rem;
+}
+
+.post-chip {
+  background: var(--surface-ground);
+  border: 1px solid var(--surface-border);
+  border-radius: 0.375rem;
+  color: var(--text-color);
+  display: grid;
+  gap: 0.375rem;
+  padding: 0.5rem;
+  text-decoration: none;
+}
+
+.post-chip span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.upcoming-card {
+  display: block;
+}
+
+.upcoming-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.upcoming-row {
+  border-top: 1px solid var(--surface-border);
+  padding-top: 0.75rem;
+}
+
+.row-actions {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+@media (max-width: 900px) {
+  .calendar-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .weekday {
+    display: none;
+  }
+
+  .page-actions,
+  .calendar-toolbar,
+  .upcoming-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .month-controls,
+  .row-actions {
+    justify-content: flex-start;
+  }
+}
