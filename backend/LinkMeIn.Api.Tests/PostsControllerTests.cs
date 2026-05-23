@@ -17,6 +17,7 @@ namespace LinkMeIn.Api.Tests
             [Fact]
             public async Task CreatePost_MissingContent_Returns400BadRequest()
             {
+                await _factory.ResetDatabaseAsync();
                 var client = CreateClient();
                 var request = new LinkMeIn.Api.Contracts.Posts.CreatePostRequest
                 {
@@ -29,6 +30,7 @@ namespace LinkMeIn.Api.Tests
         [Fact]
         public async Task CreatePost_MissingTitle_Returns400BadRequest()
         {
+            await _factory.ResetDatabaseAsync();
             var client = CreateClient();
             var request = new LinkMeIn.Api.Contracts.Posts.CreatePostRequest
             {
@@ -41,6 +43,7 @@ namespace LinkMeIn.Api.Tests
         [Fact]
         public async Task DeletePost_ValidRequest_RemovesPost()
         {
+            await _factory.ResetDatabaseAsync();
             var client = CreateClient();
             // Create a post
             var createRequest = new LinkMeIn.Api.Contracts.Posts.CreatePostRequest
@@ -64,6 +67,7 @@ namespace LinkMeIn.Api.Tests
         [Fact]
         public async Task UpdatePost_ValidRequest_Returns200AndUpdatedPost()
         {
+            await _factory.ResetDatabaseAsync();
             var client = CreateClient();
             // Create a post
             var createRequest = new LinkMeIn.Api.Contracts.Posts.CreatePostRequest
@@ -94,6 +98,7 @@ namespace LinkMeIn.Api.Tests
         [Fact]
         public async Task GetPostById_NotFound_Returns404()
         {
+            await _factory.ResetDatabaseAsync();
             var client = CreateClient();
             var randomId = Guid.NewGuid();
             var resp = await client.GetAsync($"/api/posts/{randomId}");
@@ -102,6 +107,7 @@ namespace LinkMeIn.Api.Tests
         [Fact]
         public async Task GetPostById_Returns200AndCorrectPost()
         {
+            await _factory.ResetDatabaseAsync();
             var client = CreateClient();
             var createRequest = new LinkMeIn.Api.Contracts.Posts.CreatePostRequest
             {
@@ -122,6 +128,8 @@ namespace LinkMeIn.Api.Tests
             Assert.Equal(createdPost.Content, fetchedPost.Content);
             Assert.Equal(createdPost.Status, fetchedPost.Status);
         }
+
+
         private readonly CustomWebApplicationFactory<Program> _factory;
 
         public PostsControllerTests(CustomWebApplicationFactory<Program> factory)
@@ -129,11 +137,19 @@ namespace LinkMeIn.Api.Tests
             _factory = factory;
         }
 
+        public async Task InitializeAsync()
+        {
+            await _factory.ResetDatabaseAsync();
+        }
+
+        public Task DisposeAsync() => Task.CompletedTask;
+
         private HttpClient CreateClient() => _factory.CreateClient();
 
         [Fact]
         public async Task GetAllPosts_EmptyDb_Returns200AndEmptyArray()
         {
+            await _factory.ResetDatabaseAsync();
             var client = CreateClient();
             var resp = await client.GetAsync("/api/posts");
             Assert.Equal(HttpStatusCode.OK, resp.StatusCode);
@@ -144,6 +160,7 @@ namespace LinkMeIn.Api.Tests
         [Fact]
         public async Task CreatePost_ValidRequest_Returns201AndPostDto()
         {
+            await _factory.ResetDatabaseAsync();
             var client = CreateClient();
             var request = new LinkMeIn.Api.Contracts.Posts.CreatePostRequest
             {
@@ -163,6 +180,7 @@ namespace LinkMeIn.Api.Tests
         [Fact]
         public async Task CreateScheduledPost_ValidRequest_Returns201AndScheduledPostDto()
         {
+            await _factory.ResetDatabaseAsync();
             var client = CreateClient();
             var futureDate = DateTimeOffset.UtcNow.AddDays(1);
             var request = new LinkMeIn.Api.Contracts.Posts.CreatePostRequest

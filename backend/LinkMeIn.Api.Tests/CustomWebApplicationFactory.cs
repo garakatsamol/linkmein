@@ -13,6 +13,18 @@ namespace LinkMeIn.Api.Tests
 {
     public class CustomWebApplicationFactory<TStartup> : WebApplicationFactory<TStartup> where TStartup : class
     {
+        public async Task ResetDatabaseAsync()
+        {
+            using var scope = Services.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<LinkMeInDbContext>();
+            // Remove all data from tables
+            db.PostMedia.RemoveRange(db.PostMedia);
+            db.PublishAttempts.RemoveRange(db.PublishAttempts);
+            db.Posts.RemoveRange(db.Posts);
+            db.LinkedInConnections.RemoveRange(db.LinkedInConnections);
+            db.OAuthStates.RemoveRange(db.OAuthStates);
+            await db.SaveChangesAsync();
+        }
         private readonly string _dbName = $"LinkMeInTests_{Guid.NewGuid()}";
 
         protected override IHost CreateHost(IHostBuilder builder)
