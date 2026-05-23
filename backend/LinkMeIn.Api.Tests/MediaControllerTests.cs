@@ -12,6 +12,30 @@ namespace LinkMeIn.Api.Tests
     public class MediaControllerTests : IClassFixture<CustomWebApplicationFactory<Program>>
     {
         [Fact]
+        public async Task DeleteMedia_NonExistentMedia_Returns404()
+        {
+            await _factory.ResetDatabaseAsync();
+            var client = CreateClient();
+
+            // Create a post
+            var createRequest = new LinkMeIn.Api.Contracts.Posts.CreatePostRequest
+            {
+                Title = "Test Post Delete Nonexistent Media",
+                Content = "Test Content"
+            };
+            var createResp = await client.PostAsJsonAsync("/api/posts", createRequest);
+            Assert.Equal(HttpStatusCode.Created, createResp.StatusCode);
+            var createdPost = await createResp.Content.ReadFromJsonAsync<LinkMeIn.Api.Contracts.Posts.PostDto>();
+            Assert.NotNull(createdPost);
+
+            // Generate a random Guid for a non-existent mediaId
+            var randomMediaId = Guid.NewGuid();
+
+            // Attempt to delete non-existent media
+            var deleteResp = await client.DeleteAsync($"/api/posts/{createdPost.Id}/media/{randomMediaId}");
+            Assert.Equal(HttpStatusCode.NotFound, deleteResp.StatusCode);
+        }
+        [Fact]
         public async Task DeleteMedia_RemovesMediaAndReturns204()
         {
             await _factory.ResetDatabaseAsync();
