@@ -344,6 +344,53 @@ namespace LinkMeIn.Api.Tests
             Assert.Equal("image/png", mediaDto.ContentType);
             Assert.True(mediaDto.SizeBytes > 0);
         }
+
+        [Fact]
+        public async Task GetMediaContent_ExistingImage_ReturnsImageStream()
+        {
+            await _factory.ResetDatabaseAsync();
+            var client = CreateClient();
+
+            var createRequest = new CreatePostRequest
+            {
+                Title = "Media Content Test Post",
+                Content = "Content with an image"
+            };
+            var createResp = await client.PostAsJsonAsync("/api/posts", createRequest);
+            Assert.Equal(HttpStatusCode.Created, createResp.StatusCode);
+            var createdPost = await createResp.Content.ReadFromJsonAsync<PostDto>();
+            Assert.NotNull(createdPost);
+
+            var imageBytes = new byte[] {
+                0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A,
+                0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52,
+                0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
+                0x08, 0x06, 0x00, 0x00, 0x00, 0x1F, 0x15, 0xC4,
+                0x89, 0x00, 0x00, 0x00, 0x0A, 0x49, 0x44, 0x41,
+                0x54, 0x78, 0x9C, 0x63, 0x60, 0x00, 0x00, 0x00,
+                0x02, 0x00, 0x01, 0xE2, 0x21, 0xBC, 0x33, 0x00,
+                0x00, 0x00, 0x00, 0x49, 0x45, 0x4E, 0x44, 0xAE,
+                0x42, 0x60, 0x82
+            };
+            var imageContent = new ByteArrayContent(imageBytes);
+            imageContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/png");
+
+            var form = new MultipartFormDataContent();
+            form.Add(imageContent, "file", "content-test.png");
+
+            var uploadResp = await client.PostAsync($"/api/posts/{createdPost.Id}/media", form);
+            Assert.Equal(HttpStatusCode.Created, uploadResp.StatusCode);
+            var mediaDto = await uploadResp.Content.ReadFromJsonAsync<PostMediaDto>();
+            Assert.NotNull(mediaDto);
+
+            var contentResp = await client.GetAsync($"/api/posts/{createdPost.Id}/media/{mediaDto.Id}/content");
+            Assert.Equal(HttpStatusCode.OK, contentResp.StatusCode);
+            Assert.Equal("image/png", contentResp.Content.Headers.ContentType?.MediaType);
+
+            var responseBytes = await contentResp.Content.ReadAsByteArrayAsync();
+            Assert.NotEmpty(responseBytes);
+        }
+
         private readonly CustomWebApplicationFactory<Program> _factory;
         public MediaControllerTests(CustomWebApplicationFactory<Program> factory)
         {

@@ -67,7 +67,7 @@ namespace LinkMeIn.Api.Services
             var rootPath = Path.GetFullPath(_options.RootPath);
             var candidatePath = Path.IsPathRooted(storagePath)
                 ? Path.GetFullPath(storagePath)
-                : Path.GetFullPath(Path.Combine(rootPath, storagePath));
+                : ResolveRelativeStoragePath(rootPath, storagePath);
 
             var normalizedRoot = rootPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
                 + Path.DirectorySeparatorChar;
@@ -75,6 +75,20 @@ namespace LinkMeIn.Api.Services
             return candidatePath.StartsWith(normalizedRoot, StringComparison.OrdinalIgnoreCase)
                 ? candidatePath
                 : null;
+        }
+
+        private string ResolveRelativeStoragePath(string rootPath, string storagePath)
+        {
+            var relativePath = Path.GetFullPath(storagePath);
+            var normalizedRoot = rootPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+                + Path.DirectorySeparatorChar;
+
+            if (relativePath.StartsWith(normalizedRoot, StringComparison.OrdinalIgnoreCase))
+            {
+                return relativePath;
+            }
+
+            return Path.GetFullPath(Path.Combine(rootPath, storagePath));
         }
     }
 }

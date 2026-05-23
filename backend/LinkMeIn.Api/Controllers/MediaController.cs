@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using LinkMeIn.Api.Contracts.Media;
 using LinkMeIn.Api.Data;
@@ -141,6 +142,28 @@ namespace LinkMeIn.Api.Controllers
                 .ToListAsync();
 
             return Ok(media);
+        }
+
+        [HttpGet("{mediaId:guid}/content")]
+        public async Task<IActionResult> GetMediaContent(Guid postId, Guid mediaId, CancellationToken cancellationToken)
+        {
+            var post = await _db.Posts
+                .AsNoTracking()
+                .FirstOrDefaultAsync(p => p.Id == postId && p.OwnerId == DefaultOwnerId, cancellationToken);
+            if (post == null)
+                return NotFound();
+
+            var media = await _db.PostMedia
+                .AsNoTracking()
+                .FirstOrDefaultAsync(m => m.Id == mediaId && m.PostId == postId, cancellationToken);
+            if (media == null)
+                return NotFound();
+
+            var stream = await _mediaStorage.OpenReadAsync(media.StoragePath, cancellationToken);
+            if (stream == null)
+                return NotFound();
+
+            return File(stream, media.ContentType, enableRangeProcessing: true);
         }
     }
 }
