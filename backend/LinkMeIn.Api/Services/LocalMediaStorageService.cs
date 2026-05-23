@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using LinkMeIn.Api.Options;
@@ -28,6 +29,25 @@ namespace LinkMeIn.Api.Services
             return filePath;
         }
 
+        public Task<Stream?> OpenReadAsync(string storagePath, CancellationToken cancellationToken = default)
+        {
+            var filePath = ResolveSafeStoragePath(storagePath);
+            if (filePath == null || !File.Exists(filePath))
+            {
+                return Task.FromResult<Stream?>(null);
+            }
+
+            Stream stream = new FileStream(
+                filePath,
+                FileMode.Open,
+                FileAccess.Read,
+                FileShare.Read,
+                bufferSize: 64 * 1024,
+                FileOptions.Asynchronous | FileOptions.SequentialScan);
+
+            return Task.FromResult<Stream?>(stream);
+        }
+
         public Task DeleteFileAsync(string storagePath)
         {
             if (File.Exists(storagePath))
@@ -35,6 +55,26 @@ namespace LinkMeIn.Api.Services
                 File.Delete(storagePath);
             }
             return Task.CompletedTask;
+        }
+
+        private string? ResolveSafeStoragePath(string storagePath)
+        {
+            if (string.IsNullOrWhiteSpace(storagePath))
+            {
+                return null;
+            }
+
+            var rootPath = Path.GetFullPath(_options.RootPath);
+            var candidatePath = Path.IsPathRooted(storagePath)
+                ? Path.GetFullPath(storagePath)
+                : Path.GetFullPath(Path.Combine(rootPath, storagePath));
+
+            var normalizedRoot = rootPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+                + Path.DirectorySeparatorChar;
+
+            return candidatePath.StartsWith(normalizedRoot, StringComparison.OrdinalIgnoreCase)
+                ? candidatePath
+                : null;
         }
     }
 }
