@@ -16,6 +16,35 @@ namespace LinkMeIn.Api.Controllers
     [Route("api/posts/{postId:guid}/media")]
     public class MediaController : ControllerBase
     {
+        [HttpDelete("{mediaId:guid}")]
+        public async Task<IActionResult> DeleteMedia(Guid postId, Guid mediaId)
+        {
+            // Find post
+            var post = await _db.Posts.FirstOrDefaultAsync(p => p.Id == postId && p.OwnerId == DefaultOwnerId);
+            if (post == null)
+                return NotFound();
+
+            // Find media
+            var media = await _db.PostMedia.FirstOrDefaultAsync(m => m.Id == mediaId && m.PostId == postId);
+            if (media == null)
+                return NotFound();
+
+            // Delete physical file (ignore if file does not exist)
+            try
+            {
+                await _mediaStorage.DeleteFileAsync(media.StoragePath);
+            }
+            catch (Exception)
+            {
+                // Ignore file not found or deletion errors unless the storage service throws for non-existence
+            }
+
+            // Remove DB record
+            _db.PostMedia.Remove(media);
+            await _db.SaveChangesAsync();
+
+            return NoContent();
+        }
         private readonly LinkMeInDbContext _db;
         private readonly IMediaStorageService _mediaStorage;
         private readonly MediaStorageOptions _mediaOptions;
