@@ -5,12 +5,15 @@ import Aura from '@primeuix/themes/aura';
 import { providePrimeNG } from 'primeng/config';
 
 import { routes } from './app.routes';
+import { DraftStoreService } from './core/services/draft-store.service';
+import { LocalDraftStoreService } from './core/services/local-draft-store.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideAnimationsAsync(),
     provideRouter(routes),
+    { provide: DraftStoreService, useExisting: LocalDraftStoreService },
     providePrimeNG({
       ripple: true,
       inputVariant: 'outlined',

@@ -1,0 +1,54 @@
+<div class="page-actions">
+  <div>
+    <h2>Posts</h2>
+    <p>Manage local drafts for the Phase 1 sandbox.</p>
+  </div>
+  <a pButton routerLink="/composer" label="New draft" icon="pi pi-plus"></a>
+</div>
+
+@if (feedback) {
+  <p-message severity="success" [text]="feedback" />
+}
+
+@if (drafts$ | async; as drafts) {
+  @if (drafts.length === 0) {
+    <p-card styleClass="empty-state">
+      <ng-template pTemplate="title">No drafts yet</ng-template>
+      <p>Create your first local draft to start shaping a post.</p>
+      <a pButton routerLink="/composer" label="Create draft" icon="pi pi-plus"></a>
+    </p-card>
+  } @else {
+    <div class="draft-list">
+      @for (draft of drafts; track draft.id) {
+        <article class="draft-row">
+          <div class="draft-main">
+            <div class="draft-header">
+              <h3>{{ draft.title }}</h3>
+              <p-tag [value]="draft.status" [severity]="getSeverity(draft.status)" />
+            </div>
+            <p class="content-preview">{{ getPreview(draft.content) }}</p>
+            @if (draft.scheduledFor) {
+              <p class="meta">
+                <i class="pi pi-calendar" aria-hidden="true"></i>
+                Scheduled {{ draft.scheduledFor | date: 'medium' }}
+              </p>
+            }
+          </div>
+
+          <div class="draft-actions">
+            <a pButton [routerLink]="['/composer', draft.id]" label="Edit" icon="pi pi-pencil" severity="secondary"></a>
+            <button
+              pButton
+              type="button"
+              label="Delete"
+              icon="pi pi-trash"
+              severity="danger"
+              outlined
+              (click)="deleteDraft(draft)"
+            ></button>
+          </div>
+        </article>
+      }
+    </div>
+  }
+}

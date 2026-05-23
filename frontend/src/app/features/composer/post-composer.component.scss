@@ -1,0 +1,25 @@
+:host {
+  display: block;
+  max-width: 48rem;
+}
+
+.composer-form {
+  display: grid;
+  gap: 0.625rem;
+  margin-top: 1rem;
+}
+
+label {
+  font-weight: 600;
+}
+
+.field-error {
+  color: var(--red-500);
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}

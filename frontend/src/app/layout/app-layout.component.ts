@@ -20,8 +20,8 @@ export class AppLayoutComponent {
   protected readonly navItems: NavItem[] = [
     { label: 'Dashboard', icon: 'pi pi-home', route: '/dashboard' },
     { label: 'Calendar', icon: 'pi pi-calendar', route: '/calendar', disabled: true },
-    { label: 'Posts', icon: 'pi pi-list', route: '/posts', disabled: true },
-    { label: 'Composer', icon: 'pi pi-pencil', route: '/composer', disabled: true },
+    { label: 'Posts', icon: 'pi pi-list', route: '/posts' },
+    { label: 'Composer', icon: 'pi pi-pencil', route: '/composer' },
     { label: 'LinkedIn', icon: 'pi pi-link', route: '/linkedin', disabled: true }
   ];
 }

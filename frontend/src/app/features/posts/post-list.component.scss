@@ -1,0 +1,79 @@
+:host {
+  display: grid;
+  gap: 1rem;
+}
+
+.page-actions,
+.draft-row {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+.page-actions p,
+.content-preview,
+.meta {
+  color: var(--text-color-secondary);
+}
+
+.draft-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.draft-row {
+  background: var(--surface-card);
+  border: 1px solid var(--surface-border);
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+.draft-main {
+  display: grid;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.draft-header {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.draft-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.meta {
+  align-items: center;
+  display: inline-flex;
+  gap: 0.4rem;
+}
+
+.empty-state {
+  display: block;
+  max-width: 42rem;
+}
+
+@media (max-width: 768px) {
+  .page-actions,
+  .draft-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .draft-actions {
+    justify-content: flex-start;
+  }
+}
