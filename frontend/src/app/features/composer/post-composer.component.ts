@@ -7,8 +7,14 @@ import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { TextareaModule } from 'primeng/textarea';
 
+import { DraftImage } from '../../core/models/draft-image.model';
 import { PostDraft } from '../../core/models/post-draft.model';
 import { DraftStoreService } from '../../core/services/draft-store.service';
+import { ImagePreviewService } from '../../core/services/image-preview.service';
+
+const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+const MAX_IMAGE_COUNT = 4;
+const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024;
 
 @Component({
   selector: 'app-post-composer',
@@ -19,12 +25,18 @@ import { DraftStoreService } from '../../core/services/draft-store.service';
 export class PostComposerComponent implements OnInit {
   private readonly draftStore = inject(DraftStoreService);
   private readonly formBuilder = inject(FormBuilder);
+  private readonly imagePreview = inject(ImagePreviewService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
   protected draftId: string | null = null;
   protected feedback = '';
+  protected images: DraftImage[] = [];
+  protected imageValidationMessages: string[] = [];
   protected loadError = '';
+  protected readonly acceptedImageTypes = ACCEPTED_IMAGE_TYPES.join(',');
+  protected readonly maxImageCount = MAX_IMAGE_COUNT;
+  protected readonly maxImageSizeLabel = '2 MB';
 
   protected readonly form = this.formBuilder.nonNullable.group({
     title: ['', Validators.required],
@@ -61,6 +73,7 @@ export class PostComposerComponent implements OnInit {
     const payload = {
       title: this.form.controls.title.value,
       content: this.form.controls.content.value,
+      images: this.images,
       scheduledFor: this.form.controls.scheduledFor.value || undefined
     };
     const request$ = this.draftId
@@ -82,6 +95,40 @@ export class PostComposerComponent implements OnInit {
     void this.router.navigateByUrl('/posts');
   }
 
+  protected async addImages(event: Event): Promise<void> {
+    this.imageValidationMessages = [];
+    const input = event.target as HTMLInputElement;
+    const selectedFiles = Array.from(input.files ?? []);
+
+    input.value = '';
+
+    for (const file of selectedFiles) {
+      if (this.images.length >= MAX_IMAGE_COUNT) {
+        this.imageValidationMessages.push(`You can attach up to ${MAX_IMAGE_COUNT} images per draft.`);
+        break;
+      }
+
+      try {
+        const preview = await this.imagePreview.createPreview(file, {
+          acceptedMimeTypes: ACCEPTED_IMAGE_TYPES,
+          maxSizeBytes: MAX_IMAGE_SIZE_BYTES
+        });
+        this.images = [...this.images, preview];
+      } catch (error) {
+        this.imageValidationMessages.push(error instanceof Error ? error.message : `Could not read ${file.name}.`);
+      }
+    }
+  }
+
+  protected removeImage(imageId: string): void {
+    this.images = this.images.filter((image) => image.id !== imageId);
+    this.imageValidationMessages = [];
+  }
+
+  protected formatImageSize(sizeBytes: number): string {
+    return `${Math.round((sizeBytes / 1024 / 1024) * 10) / 10} MB`;
+  }
+
   protected isInvalid(controlName: 'title' | 'content'): boolean {
     const control = this.form.controls[controlName];
     return control.invalid && (control.dirty || control.touched);
@@ -93,5 +140,6 @@ export class PostComposerComponent implements OnInit {
       content: draft.content,
       scheduledFor: draft.scheduledFor ?? ''
     });
+    this.images = draft.images;
   }
 }

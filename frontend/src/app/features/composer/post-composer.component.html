@@ -1,6 +1,6 @@
 <p-card>
   <ng-template pTemplate="title">{{ draftId ? 'Edit draft' : 'New draft' }}</ng-template>
-  <ng-template pTemplate="subtitle">Save post copy locally. Image upload and publishing come later.</ng-template>
+  <ng-template pTemplate="subtitle">Save post copy and local image previews. Publishing comes later.</ng-template>
 
   @if (feedback) {
     <p-message severity="success" [text]="feedback" />
@@ -25,6 +25,54 @@
 
     <label for="scheduledFor">Scheduled for</label>
     <input id="scheduledFor" pInputText type="datetime-local" formControlName="scheduledFor" />
+
+    <div class="image-section">
+      <div class="image-section-header">
+        <div>
+          <label for="images">Images</label>
+          <p>Up to {{ maxImageCount }} local previews. JPEG, PNG, or WebP. {{ maxImageSizeLabel }} per image.</p>
+        </div>
+        <span>{{ images.length }}/{{ maxImageCount }}</span>
+      </div>
+
+      <input
+        id="images"
+        class="file-input"
+        type="file"
+        multiple
+        [accept]="acceptedImageTypes"
+        [disabled]="images.length >= maxImageCount"
+        (change)="addImages($event)"
+      />
+
+      @for (message of imageValidationMessages; track message) {
+        <p-message severity="error" [text]="message" />
+      }
+
+      @if (images.length > 0) {
+        <div class="image-grid">
+          @for (image of images; track image.id) {
+            <article class="image-tile">
+              <img [src]="image.dataUrl" [alt]="image.fileName" />
+              <div class="image-meta">
+                <strong>{{ image.fileName }}</strong>
+                <small>{{ image.mimeType }} - {{ formatImageSize(image.sizeBytes) }}</small>
+              </div>
+              <button
+                pButton
+                type="button"
+                icon="pi pi-times"
+                severity="danger"
+                rounded
+                text
+                aria-label="Remove image"
+                (click)="removeImage(image.id)"
+              ></button>
+            </article>
+          }
+        </div>
+      }
+    </div>
 
     <div class="form-actions">
       <button pButton type="submit" label="Save draft" icon="pi pi-save"></button>

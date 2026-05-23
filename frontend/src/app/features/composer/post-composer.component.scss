@@ -17,6 +17,74 @@ label {
   color: var(--red-500);
 }
 
+.image-section {
+  border: 1px solid var(--surface-border);
+  border-radius: 0.5rem;
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+}
+
+.image-section-header {
+  align-items: flex-start;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.image-section-header p,
+.image-meta small {
+  color: var(--text-color-secondary);
+  margin: 0.25rem 0 0;
+}
+
+.file-input {
+  border: 1px dashed var(--surface-border);
+  border-radius: 0.5rem;
+  padding: 0.875rem;
+}
+
+.image-grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+}
+
+.image-tile {
+  border: 1px solid var(--surface-border);
+  border-radius: 0.5rem;
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  position: relative;
+}
+
+.image-tile img {
+  aspect-ratio: 1;
+  border-radius: 0.375rem;
+  object-fit: cover;
+  width: 100%;
+}
+
+.image-tile button {
+  position: absolute;
+  right: 0.25rem;
+  top: 0.25rem;
+}
+
+.image-meta {
+  display: grid;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.image-meta strong,
+.image-meta small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .form-actions {
   display: flex;
   flex-wrap: wrap;

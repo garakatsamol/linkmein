@@ -33,6 +33,12 @@
                 Scheduled {{ draft.scheduledFor | date: 'medium' }}
               </p>
             }
+            @if (draft.images.length > 0) {
+              <p class="meta">
+                <i class="pi pi-image" aria-hidden="true"></i>
+                {{ draft.images.length }} {{ draft.images.length === 1 ? 'image' : 'images' }}
+              </p>
+            }
           </div>
 
           <div class="draft-actions">
