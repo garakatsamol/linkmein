@@ -41,6 +41,11 @@ npm start
 
 Open `http://127.0.0.1:4200`.
 
+## Frontend Storage Mode
+
+The Angular app defaults to browser `localStorage` mode in `frontend/src/environments/environment.ts`.
+To test the local backend API during development, run the .NET API and change `storageMode` from `local` to `api`. Do not commit API mode as the default.
+
 ## Build And Test
 
 ```powershell

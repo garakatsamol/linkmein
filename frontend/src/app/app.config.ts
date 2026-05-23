@@ -6,7 +6,8 @@ import Aura from '@primeuix/themes/aura';
 import { providePrimeNG } from 'primeng/config';
 
 import { routes } from './app.routes';
-import { API_BASE_URL, DEFAULT_API_BASE_URL } from './core/api/api.config';
+import { environment } from '../environments/environment';
+import { API_BASE_URL } from './core/api/api.config';
 import { ImagePreviewService } from './core/services/image-preview.service';
 import { LocalImagePreviewService } from './core/services/local-image-preview.service';
 import { MockPublisherService } from './core/services/mock-publisher.service';
@@ -19,9 +20,8 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(),
     provideAnimationsAsync(),
     provideRouter(routes),
-    { provide: API_BASE_URL, useValue: DEFAULT_API_BASE_URL },
-    // Switch to provideDraftStoreForStorageMode('api') during backend API development.
-    provideDraftStoreForStorageMode(),
+    { provide: API_BASE_URL, useValue: environment.apiBaseUrl },
+    provideDraftStoreForStorageMode(environment.storageMode),
     { provide: ImagePreviewService, useExisting: LocalImagePreviewService },
     { provide: PublisherService, useExisting: MockPublisherService },
     providePrimeNG({
