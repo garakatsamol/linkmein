@@ -1,0 +1,11 @@
+# .NET
+bin/
+obj/
+
+# User-specific IDE files
+.vs/
+*.user
+*.suo
+
+# Environment overrides
+*.Development.local.json
