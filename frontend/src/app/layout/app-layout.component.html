@@ -1,0 +1,47 @@
+<div class="layout-shell">
+  <aside class="layout-sidebar">
+    <a class="brand" routerLink="/dashboard" aria-label="LinkMeIn dashboard">
+      <span class="brand-mark">in</span>
+      <span class="brand-copy">
+        <strong>LinkMeIn</strong>
+        <small>Post calendar</small>
+      </span>
+    </a>
+
+    <nav class="nav-list" aria-label="Primary">
+      @for (item of navItems; track item.route) {
+        @if (item.disabled) {
+          <span class="nav-link disabled" aria-disabled="true">
+            <i [class]="item.icon" aria-hidden="true"></i>
+            <span>{{ item.label }}</span>
+            <p-tag value="Soon" severity="secondary" />
+          </span>
+        } @else {
+          <a
+            class="nav-link"
+            [routerLink]="item.route"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+          >
+            <i [class]="item.icon" aria-hidden="true"></i>
+            <span>{{ item.label }}</span>
+          </a>
+        }
+      }
+    </nav>
+  </aside>
+
+  <main class="layout-main">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Phase 1</p>
+        <h1>Angular MVP shell</h1>
+      </div>
+      <button pButton type="button" label="Mock only" icon="pi pi-shield" severity="secondary" disabled></button>
+    </header>
+
+    <section class="content-region">
+      <router-outlet />
+    </section>
+  </main>
+</div>
