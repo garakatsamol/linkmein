@@ -12,6 +12,55 @@ namespace LinkMeIn.Api.Tests
     public class MediaControllerTests : IClassFixture<CustomWebApplicationFactory<Program>>
     {
         [Fact]
+        public async Task DeleteMedia_RemovesMediaAndReturns204()
+        {
+            await _factory.ResetDatabaseAsync();
+            var client = CreateClient();
+
+            // Create a post
+            var createRequest = new LinkMeIn.Api.Contracts.Posts.CreatePostRequest
+            {
+                Title = "Test Post Delete Media",
+                Content = "Test Content"
+            };
+            var createResp = await client.PostAsJsonAsync("/api/posts", createRequest);
+            Assert.Equal(HttpStatusCode.Created, createResp.StatusCode);
+            var createdPost = await createResp.Content.ReadFromJsonAsync<LinkMeIn.Api.Contracts.Posts.PostDto>();
+            Assert.NotNull(createdPost);
+
+            // Upload a valid image
+            var imageBytes = new byte[] {
+                0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, // PNG header
+                0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52,
+                0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
+                0x08, 0x06, 0x00, 0x00, 0x00, 0x1F, 0x15, 0xC4,
+                0x89, 0x00, 0x00, 0x00, 0x0A, 0x49, 0x44, 0x41,
+                0x54, 0x78, 0x9C, 0x63, 0x60, 0x00, 0x00, 0x00,
+                0x02, 0x00, 0x01, 0xE2, 0x21, 0xBC, 0x33, 0x00,
+                0x00, 0x00, 0x00, 0x49, 0x45, 0x4E, 0x44, 0xAE,
+                0x42, 0x60, 0x82
+            };
+            var imageContent = new ByteArrayContent(imageBytes);
+            imageContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/png");
+            var form = new MultipartFormDataContent();
+            form.Add(imageContent, "file", "test.png");
+            var uploadResp = await client.PostAsync($"/api/posts/{createdPost.Id}/media", form);
+            Assert.Equal(HttpStatusCode.Created, uploadResp.StatusCode);
+            var mediaDto = await uploadResp.Content.ReadFromJsonAsync<LinkMeIn.Api.Contracts.Media.PostMediaDto>();
+            Assert.NotNull(mediaDto);
+
+            // Delete the media
+            var deleteResp = await client.DeleteAsync($"/api/posts/{createdPost.Id}/media/{mediaDto.Id}");
+            Assert.Equal(HttpStatusCode.NoContent, deleteResp.StatusCode);
+
+            // Get media for the post (should be empty)
+            var getResp = await client.GetAsync($"/api/posts/{createdPost.Id}/media");
+            Assert.Equal(HttpStatusCode.OK, getResp.StatusCode);
+            var mediaList = await getResp.Content.ReadFromJsonAsync<List<LinkMeIn.Api.Contracts.Media.PostMediaDto>>();
+            Assert.NotNull(mediaList);
+            Assert.Empty(mediaList);
+        }
+        [Fact]
         public async Task UploadMedia_ExceedsMaxImages_Returns400()
         {
             await _factory.ResetDatabaseAsync();
