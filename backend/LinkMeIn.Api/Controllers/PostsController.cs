@@ -18,6 +18,47 @@ namespace LinkMeIn.Api.Controllers
             _db = db;
         }
 
+        [HttpPost]
+        public async Task<ActionResult<PostDto>> Create([FromBody] CreatePostRequest req)
+        {
+            if (!ModelState.IsValid)
+                return ValidationProblem(ModelState);
+
+            var now = DateTimeOffset.UtcNow;
+            var status = req.ScheduledFor.HasValue && req.ScheduledFor.Value > now
+                ? Entities.PostStatus.Scheduled
+                : Entities.PostStatus.Draft;
+
+            var post = new Entities.Post
+            {
+                Id = Guid.NewGuid(),
+                Title = req.Title,
+                Content = req.Content,
+                Status = status,
+                ScheduledFor = req.ScheduledFor,
+                OwnerId = DefaultOwnerId,
+                CreatedAt = now,
+                UpdatedAt = now
+            };
+            _db.Posts.Add(post);
+            await _db.SaveChangesAsync();
+
+            var dto = new PostDto
+            {
+                Id = post.Id,
+                Title = post.Title,
+                Content = post.Content,
+                Status = post.Status.ToString(),
+                ScheduledFor = post.ScheduledFor,
+                PublishedAt = post.PublishedAt,
+                LinkedInPostId = post.LinkedInPostId,
+                CreatedAt = post.CreatedAt,
+                UpdatedAt = post.UpdatedAt
+            };
+
+            return CreatedAtAction(nameof(GetById), new { id = post.Id }, dto);
+        }
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PostDto>>> GetAll()
         {
