@@ -7,6 +7,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
+    
+    builder.Services.Configure<LinkMeIn.Api.Options.MediaStorageOptions>(
+        builder.Configuration.GetSection("MediaStorage"));
+    builder.Services.AddScoped<LinkMeIn.Api.Services.IMediaStorageService, LinkMeIn.Api.Services.LocalMediaStorageService>();
 
 builder.Services.AddCors(options =>
 {
