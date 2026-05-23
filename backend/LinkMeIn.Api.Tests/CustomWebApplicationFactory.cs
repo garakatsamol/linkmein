@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Linq;
 using LinkMeIn.Api.Data;
@@ -12,44 +13,26 @@ namespace LinkMeIn.Api.Tests
 {
     public class CustomWebApplicationFactory<TStartup> : WebApplicationFactory<TStartup> where TStartup : class
     {
+        private readonly string _dbName = $"LinkMeInTests_{Guid.NewGuid()}";
+
         protected override IHost CreateHost(IHostBuilder builder)
         {
             builder.UseEnvironment("Testing");
+            builder.ConfigureAppConfiguration((context, configBuilder) =>
+            {
+                var dict = new System.Collections.Generic.Dictionary<string, string>
+                {
+                    ["Database:Provider"] = "InMemory",
+                    ["Database:InMemoryName"] = _dbName
+                };
+                configBuilder.AddInMemoryCollection(dict);
+            });
             return base.CreateHost(builder);
         }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
-            builder.ConfigureServices(services =>
-            {
-                // Remove the app's LinkMeInDbContext registration.
-                var descriptor = services.SingleOrDefault(
-                    d => d.ServiceType == typeof(DbContextOptions<LinkMeInDbContext>));
-                if (descriptor != null)
-                {
-                    services.Remove(descriptor);
-                }
-
-                // Add InMemory database for testing.
-                services.AddDbContext<LinkMeInDbContext>(options =>
-                {
-                    options.UseInMemoryDatabase($"TestDb_{Guid.NewGuid()}");
-                });
-
-                // Build the service provider.
-                var sp = services.BuildServiceProvider();
-
-                // Create a scope to obtain a reference to the database context (LinkMeInDbContext).
-                using (var scope = sp.CreateScope())
-                {
-                    var scopedServices = scope.ServiceProvider;
-                    var db = scopedServices.GetRequiredService<LinkMeInDbContext>();
-                    var logger = scopedServices.GetRequiredService<ILogger<CustomWebApplicationFactory<TStartup>>>();
-
-                    // Ensure the database is created.
-                    db.Database.EnsureCreated();
-                }
-            });
+            // No service removal or direct DbContext registration. Program.cs handles all registration.
         }
     }
 }

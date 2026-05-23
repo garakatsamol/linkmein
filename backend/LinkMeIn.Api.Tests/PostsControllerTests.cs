@@ -12,9 +12,31 @@ using Xunit;
 
 namespace LinkMeIn.Api.Tests
 {
-
     public class PostsControllerTests : IClassFixture<CustomWebApplicationFactory<Program>>
     {
+        [Fact]
+        public async Task GetPostById_Returns200AndCorrectPost()
+        {
+            var client = CreateClient();
+            var createRequest = new LinkMeIn.Api.Contracts.Posts.CreatePostRequest
+            {
+                Title = "GetById Title",
+                Content = "GetById Content"
+            };
+            var createResp = await client.PostAsJsonAsync("/api/posts", createRequest);
+            Assert.Equal(HttpStatusCode.Created, createResp.StatusCode);
+            var createdPost = await createResp.Content.ReadFromJsonAsync<LinkMeIn.Api.Contracts.Posts.PostDto>();
+            Assert.NotNull(createdPost);
+
+            var getResp = await client.GetAsync($"/api/posts/{createdPost.Id}");
+            Assert.Equal(HttpStatusCode.OK, getResp.StatusCode);
+            var fetchedPost = await getResp.Content.ReadFromJsonAsync<LinkMeIn.Api.Contracts.Posts.PostDto>();
+            Assert.NotNull(fetchedPost);
+            Assert.Equal(createdPost.Id, fetchedPost.Id);
+            Assert.Equal(createdPost.Title, fetchedPost.Title);
+            Assert.Equal(createdPost.Content, fetchedPost.Content);
+            Assert.Equal(createdPost.Status, fetchedPost.Status);
+        }
         private readonly CustomWebApplicationFactory<Program> _factory;
 
         public PostsControllerTests(CustomWebApplicationFactory<Program> factory)

@@ -26,8 +26,9 @@ var isTesting = builder.Environment.IsEnvironment("Testing");
 
 if (string.Equals(dbProvider, "InMemory", StringComparison.OrdinalIgnoreCase) || isTesting)
 {
+    var inMemoryDatabaseName = builder.Configuration["Database:InMemoryName"] ?? "LinkMeInTests";
     builder.Services.AddDbContext<LinkMeInDbContext>(options =>
-        options.UseInMemoryDatabase($"LinkMeInTests_{Guid.NewGuid()}"));
+        options.UseInMemoryDatabase(inMemoryDatabaseName));
 }
 else
 {
