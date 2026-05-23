@@ -15,6 +15,14 @@ namespace LinkMeIn.Api.Tests
     public class PostsControllerTests : IClassFixture<CustomWebApplicationFactory<Program>>
     {
         [Fact]
+        public async Task GetPostById_NotFound_Returns404()
+        {
+            var client = CreateClient();
+            var randomId = Guid.NewGuid();
+            var resp = await client.GetAsync($"/api/posts/{randomId}");
+            Assert.Equal(HttpStatusCode.NotFound, resp.StatusCode);
+        }
+        [Fact]
         public async Task GetPostById_Returns200AndCorrectPost()
         {
             var client = CreateClient();
