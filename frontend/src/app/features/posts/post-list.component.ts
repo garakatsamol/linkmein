@@ -5,7 +5,7 @@ import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { MessageModule } from 'primeng/message';
 import { TagModule } from 'primeng/tag';
-import { Observable } from 'rxjs';
+import { Observable, Subject, startWith, switchMap } from 'rxjs';
 
 import { PostDraft, PostStatus } from '../../core/models/post-draft.model';
 import { DraftStoreService } from '../../core/services/draft-store.service';
@@ -20,8 +20,12 @@ import { PublisherService } from '../../core/services/publisher.service';
 export class PostListComponent {
   private readonly draftStore = inject(DraftStoreService);
   private readonly publisher = inject(PublisherService);
+  private readonly refreshDraftsSubject = new Subject<void>();
 
-  protected readonly drafts$: Observable<PostDraft[]> = this.draftStore.listDrafts();
+  protected readonly drafts$: Observable<PostDraft[]> = this.refreshDraftsSubject.pipe(
+    startWith(void 0),
+    switchMap(() => this.draftStore.listDrafts())
+  );
   protected feedback = '';
   protected publishError = '';
 
@@ -34,6 +38,7 @@ export class PostListComponent {
 
     this.draftStore.deleteDraft(draft.id).subscribe(() => {
       this.feedback = 'Draft deleted.';
+      this.refreshDraftsSubject.next();
     });
   }
 
