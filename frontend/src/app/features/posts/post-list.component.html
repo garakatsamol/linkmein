@@ -10,6 +10,12 @@
   <p-message severity="success" [text]="feedback" />
 }
 
+@if (publishError) {
+  <p-message severity="error" [text]="publishError" />
+}
+
+<p-message severity="info" text="Sandbox only — not posted to LinkedIn." />
+
 @if (drafts$ | async; as drafts) {
   @if (drafts.length === 0) {
     <p-card styleClass="empty-state">
@@ -39,6 +45,12 @@
                 {{ draft.images.length }} {{ draft.images.length === 1 ? 'image' : 'images' }}
               </p>
             }
+            @if (draft.mockPublishedAt) {
+              <p class="meta">
+                <i class="pi pi-check-circle" aria-hidden="true"></i>
+                Sandbox published {{ draft.mockPublishedAt | date: 'medium' }}
+              </p>
+            }
           </div>
 
           <div class="draft-actions">
@@ -51,6 +63,15 @@
               outlined
             ></a>
             <a pButton [routerLink]="['/composer', draft.id]" label="Edit" icon="pi pi-pencil" severity="secondary"></a>
+            <button
+              pButton
+              type="button"
+              label="Sandbox publish"
+              icon="pi pi-send"
+              severity="secondary"
+              [disabled]="draft.status === 'mock-published'"
+              (click)="sandboxPublish(draft)"
+            ></button>
             <button
               pButton
               type="button"

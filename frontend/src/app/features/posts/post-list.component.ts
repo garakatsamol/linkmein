@@ -9,6 +9,7 @@ import { Observable } from 'rxjs';
 
 import { PostDraft, PostStatus } from '../../core/models/post-draft.model';
 import { DraftStoreService } from '../../core/services/draft-store.service';
+import { PublisherService } from '../../core/services/publisher.service';
 
 @Component({
   selector: 'app-post-list',
@@ -18,9 +19,11 @@ import { DraftStoreService } from '../../core/services/draft-store.service';
 })
 export class PostListComponent {
   private readonly draftStore = inject(DraftStoreService);
+  private readonly publisher = inject(PublisherService);
 
   protected readonly drafts$: Observable<PostDraft[]> = this.draftStore.listDrafts();
   protected feedback = '';
+  protected publishError = '';
 
   protected deleteDraft(draft: PostDraft): void {
     const confirmed = confirm(`Delete "${draft.title}"?`);
@@ -31,6 +34,25 @@ export class PostListComponent {
 
     this.draftStore.deleteDraft(draft.id).subscribe(() => {
       this.feedback = 'Draft deleted.';
+    });
+  }
+
+  protected sandboxPublish(draft: PostDraft): void {
+    this.feedback = '';
+    this.publishError = '';
+
+    if (draft.status === 'mock-published') {
+      this.feedback = 'This draft is already sandbox-published. It was not posted to LinkedIn.';
+      return;
+    }
+
+    this.publisher.publishDraft(draft).subscribe({
+      next: (result) => {
+        this.feedback = result.message;
+      },
+      error: () => {
+        this.publishError = 'Sandbox publish failed. Nothing was posted to LinkedIn.';
+      }
     });
   }
 

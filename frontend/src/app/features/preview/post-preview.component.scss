@@ -26,6 +26,12 @@ p {
   justify-content: flex-end;
 }
 
+.publish-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
 @media (max-width: 768px) {
   .page-actions {
     align-items: stretch;

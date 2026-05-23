@@ -9,8 +9,44 @@
   </div>
 </div>
 
-@if (preview$ | async; as preview) {
-  <app-linkedin-preview-card [preview]="preview" />
+@if (draft$ | async; as draft) {
+  <p-message severity="info" text="Sandbox only — not posted to LinkedIn." />
+
+  @if (feedback) {
+    <p-message severity="success" [text]="feedback" />
+  }
+
+  @if (publishError) {
+    <p-message severity="error" [text]="publishError" />
+  }
+
+  @if (draft.mockPublishedAt) {
+    <p-message severity="success" [text]="'Sandbox published ' + (draft.mockPublishedAt | date: 'medium') + '. This was not posted to LinkedIn.'" />
+  }
+
+  <div class="publish-actions">
+    <button
+      pButton
+      type="button"
+      label="Sandbox publish"
+      icon="pi pi-send"
+      [disabled]="draft.status === 'mock-published'"
+      (click)="sandboxPublish(draft)"
+    ></button>
+    <button
+      pButton
+      type="button"
+      label="Publish to LinkedIn"
+      icon="pi pi-lock"
+      severity="secondary"
+      outlined
+      disabled
+    ></button>
+  </div>
+
+  @if (preview$ | async; as preview) {
+    <app-linkedin-preview-card [preview]="preview" />
+  }
 } @else {
   <p-message severity="error" text="Draft not found." />
 }

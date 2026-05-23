@@ -49,6 +49,7 @@ export class LocalDraftStoreService extends DraftStoreService {
       title: payload.title.trim(),
       content: payload.content.trim(),
       images: payload.images ?? existingDraft.images,
+      mockPublishedAt: payload.mockPublishedAt ?? existingDraft.mockPublishedAt,
       scheduledFor: payload.scheduledFor,
       status: payload.status ?? this.getStatus(payload.scheduledFor),
       updatedAt: new Date().toISOString()
