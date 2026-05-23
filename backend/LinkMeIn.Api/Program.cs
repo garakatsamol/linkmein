@@ -5,7 +5,9 @@ const string AngularDevelopmentCorsPolicy = "AngularDevelopment";
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddControllers();
 builder.Services.AddOpenApi();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(
@@ -18,8 +20,20 @@ builder.Services.AddCors(options =>
                 .AllowAnyMethod();
         });
 });
-builder.Services.AddDbContext<LinkMeInDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+var dbProvider = builder.Configuration["Database:Provider"];
+var isTesting = builder.Environment.IsEnvironment("Testing");
+
+if (string.Equals(dbProvider, "InMemory", StringComparison.OrdinalIgnoreCase) || isTesting)
+{
+    builder.Services.AddDbContext<LinkMeInDbContext>(options =>
+        options.UseInMemoryDatabase($"LinkMeInTests_{Guid.NewGuid()}"));
+}
+else
+{
+    builder.Services.AddDbContext<LinkMeInDbContext>(options =>
+        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+}
 
 var app = builder.Build();
 
@@ -31,6 +45,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseCors(AngularDevelopmentCorsPolicy);
 
+app.MapControllers();
+
 app.MapGet("/api/health", () => Results.Ok(new
 {
     status = "ok",
@@ -41,4 +57,6 @@ app.MapGet("/api/health", () => Results.Ok(new
 
 app.Run();
 
-public partial class Program { }
+public partial class Program
+{
+}
