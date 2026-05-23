@@ -34,5 +34,23 @@ namespace LinkMeIn.Api.Tests
             Assert.NotNull(posts);
             Assert.Empty(posts);
         }
+        [Fact]
+        public async Task CreatePost_ValidRequest_Returns201AndPostDto()
+        {
+            var client = CreateClient();
+            var request = new LinkMeIn.Api.Contracts.Posts.CreatePostRequest
+            {
+                Title = "Test Title",
+                Content = "Test Content"
+            };
+            var resp = await client.PostAsJsonAsync("/api/posts", request);
+            Assert.Equal(HttpStatusCode.Created, resp.StatusCode);
+            var post = await resp.Content.ReadFromJsonAsync<LinkMeIn.Api.Contracts.Posts.PostDto>();
+            Assert.NotNull(post);
+            Assert.Equal(request.Title, post.Title);
+            Assert.Equal(request.Content, post.Content);
+            Assert.Equal("Draft", post.Status);
+            Assert.NotEqual(Guid.Empty, post.Id);
+        }
     }
 }
