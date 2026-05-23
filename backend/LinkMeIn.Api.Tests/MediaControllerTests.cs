@@ -12,6 +12,46 @@ namespace LinkMeIn.Api.Tests
     public class MediaControllerTests : IClassFixture<CustomWebApplicationFactory<Program>>
     {
         [Fact]
+        public async Task UploadMedia_OversizedImage_Returns400()
+        {
+            await _factory.ResetDatabaseAsync();
+            var client = CreateClient();
+
+            // Create a post
+            var createRequest = new LinkMeIn.Api.Contracts.Posts.CreatePostRequest
+            {
+                Title = "Test Post Oversized Image",
+                Content = "Test Content"
+            };
+            var createResp = await client.PostAsJsonAsync("/api/posts", createRequest);
+            Assert.Equal(HttpStatusCode.Created, createResp.StatusCode);
+            var createdPost = await createResp.Content.ReadFromJsonAsync<LinkMeIn.Api.Contracts.Posts.PostDto>();
+            Assert.NotNull(createdPost);
+
+            // Create a fake PNG image in memory larger than 2MB (2097152 bytes)
+            var oversizedLength = 2097152 + 1;
+            var imageBytes = new byte[oversizedLength];
+            // PNG header
+            imageBytes[0] = 0x89;
+            imageBytes[1] = 0x50;
+            imageBytes[2] = 0x4E;
+            imageBytes[3] = 0x47;
+            imageBytes[4] = 0x0D;
+            imageBytes[5] = 0x0A;
+            imageBytes[6] = 0x1A;
+            imageBytes[7] = 0x0A;
+            // The rest is just zeroes
+            var imageContent = new ByteArrayContent(imageBytes);
+            imageContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/png");
+
+            var form = new MultipartFormDataContent();
+            form.Add(imageContent, "file", "oversized.png");
+
+            // Upload oversized image
+            var uploadResp = await client.PostAsync($"/api/posts/{createdPost.Id}/media", form);
+            Assert.Equal(HttpStatusCode.BadRequest, uploadResp.StatusCode);
+        }
+        [Fact]
         public async Task UploadMedia_NonExistentPost_Returns404()
         {
             await _factory.ResetDatabaseAsync();
