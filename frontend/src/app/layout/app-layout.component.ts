@@ -22,6 +22,6 @@ export class AppLayoutComponent {
     { label: 'Calendar', icon: 'pi pi-calendar', route: '/calendar' },
     { label: 'Posts', icon: 'pi pi-list', route: '/posts' },
     { label: 'Composer', icon: 'pi pi-pencil', route: '/composer' },
-    { label: 'LinkedIn', icon: 'pi pi-link', route: '/linkedin', disabled: true }
+    { label: 'LinkedIn', icon: 'pi pi-link', route: '/linkedin' }
   ];
 }

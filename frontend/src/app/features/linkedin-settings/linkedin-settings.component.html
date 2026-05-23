@@ -1,0 +1,51 @@
+<div class="page-heading">
+  <h2>LinkedIn settings</h2>
+  <p>Connection and production publishing are placeholders during Phase 1.</p>
+</div>
+
+<p-message
+  severity="info"
+  text="Current app mode: sandbox publishing only. Nothing is posted to LinkedIn."
+/>
+
+<div class="settings-grid">
+  <p-card>
+    <ng-template pTemplate="title">LinkedIn connection</ng-template>
+    <ng-template pTemplate="subtitle">Not implemented in Phase 1</ng-template>
+
+    <p>
+      LinkedIn OAuth will require a backend to safely handle redirects, token exchange, token storage, and API calls.
+      Angular must not store LinkedIn client secrets.
+    </p>
+
+    <p-divider />
+
+    <button pButton type="button" label="Connect LinkedIn" icon="pi pi-lock" disabled></button>
+    <p class="helper-copy">Disabled until the backend OAuth flow is explicitly implemented.</p>
+  </p-card>
+
+  <p-card>
+    <ng-template pTemplate="title">Production publishing</ng-template>
+    <ng-template pTemplate="subtitle">Backend required</ng-template>
+
+    <div class="status-row">
+      <span>Real publish action</span>
+      <p-tag value="Disabled" severity="secondary" />
+    </div>
+    <div class="status-row">
+      <span>Media upload</span>
+      <p-tag value="Disabled" severity="secondary" />
+    </div>
+    <div class="status-row">
+      <span>LinkedIn API access</span>
+      <p-tag value="Not configured" severity="warn" />
+    </div>
+
+    <p-divider />
+
+    <p>
+      Future backend work will handle LinkedIn OAuth, token storage, media upload, real publishing, scheduled publishing,
+      and publish audit logs.
+    </p>
+  </p-card>
+</div>

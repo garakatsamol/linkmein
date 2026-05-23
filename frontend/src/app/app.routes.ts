@@ -41,6 +41,11 @@ export const routes: Routes = [
         path: 'composer/:id',
         loadComponent: () =>
           import('./features/composer/post-composer.component').then((m) => m.PostComposerComponent)
+      },
+      {
+        path: 'linkedin',
+        loadComponent: () =>
+          import('./features/linkedin-settings/linkedin-settings.component').then((m) => m.LinkedinSettingsComponent)
       }
     ]
   },

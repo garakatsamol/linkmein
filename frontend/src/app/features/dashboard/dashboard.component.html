@@ -1,9 +1,65 @@
-<p-card>
-  <ng-template pTemplate="title">MVP foundation</ng-template>
-  <ng-template pTemplate="subtitle">Repository shell and contracts are ready for the next commit.</ng-template>
+<div class="page-actions">
+  <div>
+    <h2>Dashboard</h2>
+    <p>Local planning overview for the Phase 1 sandbox.</p>
+  </div>
+  <div class="action-group">
+    <a pButton routerLink="/composer" label="New draft" icon="pi pi-plus"></a>
+    <a pButton routerLink="/posts" label="View posts" icon="pi pi-list" severity="secondary"></a>
+    <a pButton routerLink="/calendar" label="View calendar" icon="pi pi-calendar" severity="secondary" outlined></a>
+    <a pButton routerLink="/linkedin" label="LinkedIn settings" icon="pi pi-link" severity="secondary" outlined></a>
+  </div>
+</div>
 
-  <p-message
-    severity="info"
-    text="Phase 1 is local-only: no LinkedIn OAuth, no LinkedIn API calls, no backend publishing, and no automation."
-  />
-</p-card>
+<p-message
+  severity="info"
+  text="Phase 1 is local-only. Sandbox publishing is not posted to LinkedIn."
+/>
+
+@if (view$ | async; as view) {
+  <section class="metric-grid" aria-label="Draft metrics">
+    @for (metric of view.metrics; track metric.label) {
+      <p-card styleClass="metric-card">
+        <div class="metric-content">
+          <span class="metric-icon"><i [class]="metric.icon" aria-hidden="true"></i></span>
+          <div>
+            <strong>{{ metric.value }}</strong>
+            <p>{{ metric.label }}</p>
+          </div>
+        </div>
+      </p-card>
+    }
+  </section>
+
+  <p-card styleClass="posts-card">
+    <ng-template pTemplate="title">Recent and upcoming posts</ng-template>
+    <ng-template pTemplate="subtitle">Upcoming scheduled posts appear first; otherwise latest drafts are shown.</ng-template>
+
+    @if (view.featuredPosts.length === 0) {
+      <div class="empty-state">
+        <p>No drafts yet.</p>
+        <a pButton routerLink="/composer" label="Create draft" icon="pi pi-plus"></a>
+      </div>
+    } @else {
+      <div class="post-list">
+        @for (post of view.featuredPosts; track post.id) {
+          <article class="post-row">
+            <div class="post-copy">
+              <h3>{{ post.title }}</h3>
+              @if (post.scheduledFor) {
+                <p>{{ post.scheduledFor | date: 'medium' }}</p>
+              } @else {
+                <p>Updated {{ post.updatedAt | date: 'medium' }}</p>
+              }
+            </div>
+            <p-tag [value]="post.status" [severity]="getSeverity(post.status)" />
+            <div class="row-actions">
+              <a pButton [routerLink]="['/posts', post.id, 'preview']" label="Preview" icon="pi pi-eye" severity="secondary" outlined></a>
+              <a pButton [routerLink]="['/composer', post.id]" label="Edit" icon="pi pi-pencil" severity="secondary"></a>
+            </div>
+          </article>
+        }
+      </div>
+    }
+  </p-card>
+}

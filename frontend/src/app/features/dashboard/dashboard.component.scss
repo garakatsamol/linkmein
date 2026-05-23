@@ -1,3 +1,102 @@
 :host {
+  display: grid;
+  gap: 1rem;
+}
+
+.page-actions,
+.action-group,
+.post-row,
+.row-actions,
+.metric-content {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.page-actions,
+.post-row {
+  justify-content: space-between;
+}
+
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+.page-actions p,
+.post-copy p,
+.metric-content p,
+.empty-state p {
+  color: var(--text-color-secondary);
+}
+
+.action-group,
+.row-actions {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.metric-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+}
+
+.metric-card {
   display: block;
+}
+
+.metric-icon {
+  align-items: center;
+  background: var(--surface-ground);
+  border-radius: 0.5rem;
+  color: var(--primary-color);
+  display: inline-flex;
+  height: 2.75rem;
+  justify-content: center;
+  width: 2.75rem;
+}
+
+.metric-content strong {
+  display: block;
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.posts-card {
+  display: block;
+}
+
+.post-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.post-row {
+  border-top: 1px solid var(--surface-border);
+  padding-top: 0.75rem;
+}
+
+.post-copy {
+  min-width: 0;
+}
+
+.empty-state {
+  display: grid;
+  gap: 0.75rem;
+  justify-items: start;
+}
+
+@media (max-width: 768px) {
+  .page-actions,
+  .post-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .action-group,
+  .row-actions {
+    justify-content: flex-start;
+  }
 }
