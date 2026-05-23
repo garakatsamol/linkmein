@@ -391,6 +391,96 @@ namespace LinkMeIn.Api.Tests
             Assert.NotEmpty(responseBytes);
         }
 
+        [Fact]
+        public async Task GetMediaContent_NonExistentPost_Returns404()
+        {
+            await _factory.ResetDatabaseAsync();
+            var client = CreateClient();
+
+            var postId = Guid.NewGuid();
+            var mediaId = Guid.NewGuid();
+
+            var response = await client.GetAsync($"/api/posts/{postId}/media/{mediaId}/content");
+
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task GetMediaContent_NonExistentMedia_Returns404()
+        {
+            await _factory.ResetDatabaseAsync();
+            var client = CreateClient();
+
+            var createRequest = new CreatePostRequest
+            {
+                Title = "Media Content Missing Media Test",
+                Content = "No matching media"
+            };
+            var createResp = await client.PostAsJsonAsync("/api/posts", createRequest);
+            Assert.Equal(HttpStatusCode.Created, createResp.StatusCode);
+            var createdPost = await createResp.Content.ReadFromJsonAsync<PostDto>();
+            Assert.NotNull(createdPost);
+
+            var mediaId = Guid.NewGuid();
+
+            var response = await client.GetAsync($"/api/posts/{createdPost.Id}/media/{mediaId}/content");
+
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task GetMediaContent_MediaBelongsToDifferentPost_Returns404()
+        {
+            await _factory.ResetDatabaseAsync();
+            var client = CreateClient();
+
+            var createPostA = new CreatePostRequest
+            {
+                Title = "Media Owner A",
+                Content = "Owns the image"
+            };
+            var createRespA = await client.PostAsJsonAsync("/api/posts", createPostA);
+            Assert.Equal(HttpStatusCode.Created, createRespA.StatusCode);
+            var postA = await createRespA.Content.ReadFromJsonAsync<PostDto>();
+            Assert.NotNull(postA);
+
+            var createPostB = new CreatePostRequest
+            {
+                Title = "Media Owner B",
+                Content = "Does not own the image"
+            };
+            var createRespB = await client.PostAsJsonAsync("/api/posts", createPostB);
+            Assert.Equal(HttpStatusCode.Created, createRespB.StatusCode);
+            var postB = await createRespB.Content.ReadFromJsonAsync<PostDto>();
+            Assert.NotNull(postB);
+
+            var imageBytes = new byte[] {
+                0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A,
+                0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52,
+                0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
+                0x08, 0x06, 0x00, 0x00, 0x00, 0x1F, 0x15, 0xC4,
+                0x89, 0x00, 0x00, 0x00, 0x0A, 0x49, 0x44, 0x41,
+                0x54, 0x78, 0x9C, 0x63, 0x60, 0x00, 0x00, 0x00,
+                0x02, 0x00, 0x01, 0xE2, 0x21, 0xBC, 0x33, 0x00,
+                0x00, 0x00, 0x00, 0x49, 0x45, 0x4E, 0x44, 0xAE,
+                0x42, 0x60, 0x82
+            };
+            var imageContent = new ByteArrayContent(imageBytes);
+            imageContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/png");
+
+            var form = new MultipartFormDataContent();
+            form.Add(imageContent, "file", "owned-by-post-a.png");
+
+            var uploadResp = await client.PostAsync($"/api/posts/{postA.Id}/media", form);
+            Assert.Equal(HttpStatusCode.Created, uploadResp.StatusCode);
+            var mediaDto = await uploadResp.Content.ReadFromJsonAsync<PostMediaDto>();
+            Assert.NotNull(mediaDto);
+
+            var response = await client.GetAsync($"/api/posts/{postB.Id}/media/{mediaDto.Id}/content");
+
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
         private readonly CustomWebApplicationFactory<Program> _factory;
         public MediaControllerTests(CustomWebApplicationFactory<Program> factory)
         {
