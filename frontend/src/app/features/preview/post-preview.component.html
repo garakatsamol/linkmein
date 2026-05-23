@@ -1,0 +1,16 @@
+<div class="page-actions">
+  <div>
+    <h2>Sandbox preview</h2>
+    <p>Review how this draft could look in a professional feed.</p>
+  </div>
+  <div class="action-group">
+    <a pButton routerLink="/posts" label="Back to posts" icon="pi pi-arrow-left" severity="secondary" outlined></a>
+    <a pButton [routerLink]="['/composer', draftId]" label="Edit draft" icon="pi pi-pencil"></a>
+  </div>
+</div>
+
+@if (preview$ | async; as preview) {
+  <app-linkedin-preview-card [preview]="preview" />
+} @else {
+  <p-message severity="error" text="Draft not found." />
+}

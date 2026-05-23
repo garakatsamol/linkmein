@@ -23,6 +23,11 @@ export const routes: Routes = [
           import('./features/posts/post-list.component').then((m) => m.PostListComponent)
       },
       {
+        path: 'posts/:id/preview',
+        loadComponent: () =>
+          import('./features/preview/post-preview.component').then((m) => m.PostPreviewComponent)
+      },
+      {
         path: 'composer',
         loadComponent: () =>
           import('./features/composer/post-composer.component').then((m) => m.PostComposerComponent)

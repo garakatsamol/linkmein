@@ -42,6 +42,14 @@
           </div>
 
           <div class="draft-actions">
+            <a
+              pButton
+              [routerLink]="['/posts', draft.id, 'preview']"
+              label="Preview"
+              icon="pi pi-eye"
+              severity="secondary"
+              outlined
+            ></a>
             <a pButton [routerLink]="['/composer', draft.id]" label="Edit" icon="pi pi-pencil" severity="secondary"></a>
             <button
               pButton

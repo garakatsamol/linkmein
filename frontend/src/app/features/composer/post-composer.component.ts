@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
@@ -14,11 +14,11 @@ import { ImagePreviewService } from '../../core/services/image-preview.service';
 
 const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_IMAGE_COUNT = 4;
-const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024;
+const MAX_IMAGE_SIZE_BYTES = 4 * 1024 * 1024;
 
 @Component({
   selector: 'app-post-composer',
-  imports: [ButtonModule, CardModule, InputTextModule, MessageModule, ReactiveFormsModule, TextareaModule],
+  imports: [ButtonModule, CardModule, InputTextModule, MessageModule, ReactiveFormsModule, RouterLink, TextareaModule],
   templateUrl: './post-composer.component.html',
   styleUrl: './post-composer.component.scss'
 })
@@ -36,7 +36,7 @@ export class PostComposerComponent implements OnInit {
   protected loadError = '';
   protected readonly acceptedImageTypes = ACCEPTED_IMAGE_TYPES.join(',');
   protected readonly maxImageCount = MAX_IMAGE_COUNT;
-  protected readonly maxImageSizeLabel = '2 MB';
+  protected readonly maxImageSizeLabel = '4 MB';
 
   protected readonly form = this.formBuilder.nonNullable.group({
     title: ['', Validators.required],
@@ -81,9 +81,10 @@ export class PostComposerComponent implements OnInit {
       : this.draftStore.createDraft(payload);
 
     request$.subscribe({
-      next: () => {
+      next: (draft) => {
+        this.draftId = draft.id;
         this.feedback = 'Draft saved.';
-        void this.router.navigateByUrl('/posts');
+        void this.router.navigate(['/composer', draft.id], { replaceUrl: true });
       },
       error: () => {
         this.loadError = 'Unable to save this draft.';

@@ -76,6 +76,9 @@
 
     <div class="form-actions">
       <button pButton type="submit" label="Save draft" icon="pi pi-save"></button>
+      @if (draftId) {
+        <a pButton [routerLink]="['/posts', draftId, 'preview']" label="Preview" icon="pi pi-eye" severity="secondary"></a>
+      }
       <button pButton type="button" label="Cancel" icon="pi pi-times" severity="secondary" outlined (click)="cancel()"></button>
     </div>
   </form>

@@ -1,0 +1,38 @@
+:host {
+  display: grid;
+  gap: 1rem;
+}
+
+.page-actions {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+h2,
+p {
+  margin: 0;
+}
+
+.page-actions p {
+  color: var(--text-color-secondary);
+}
+
+.action-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+@media (max-width: 768px) {
+  .page-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .action-group {
+    justify-content: flex-start;
+  }
+}

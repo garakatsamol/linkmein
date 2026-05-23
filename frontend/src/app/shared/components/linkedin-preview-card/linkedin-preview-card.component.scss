@@ -1,0 +1,102 @@
+:host {
+  display: block;
+}
+
+.preview-card {
+  display: block;
+  max-width: 42rem;
+}
+
+.sandbox-label,
+.preview-author,
+.scheduled-date {
+  align-items: center;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.sandbox-label {
+  color: var(--text-color-secondary);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.preview-author {
+  align-items: flex-start;
+}
+
+.avatar {
+  align-items: center;
+  background: var(--primary-color);
+  border-radius: 50%;
+  color: #ffffff;
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-weight: 700;
+  height: 3rem;
+  justify-content: center;
+  width: 3rem;
+}
+
+.author-copy {
+  display: grid;
+  flex: 1;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.author-copy span,
+.author-copy small,
+.scheduled-date {
+  color: var(--text-color-secondary);
+}
+
+.scheduled-date {
+  margin: 1rem 0 0;
+}
+
+.post-content {
+  line-height: 1.55;
+  margin: 1rem 0;
+  white-space: pre-wrap;
+}
+
+.image-grid {
+  border-radius: 0.5rem;
+  display: grid;
+  gap: 0.25rem;
+  overflow: hidden;
+}
+
+.image-grid img {
+  background: var(--surface-border);
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.image-count-1 {
+  grid-template-columns: 1fr;
+}
+
+.image-count-1 img {
+  aspect-ratio: 16 / 10;
+}
+
+.image-count-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.image-count-2 img {
+  aspect-ratio: 1;
+}
+
+.image-count-3,
+.image-count-4 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.image-count-3 img,
+.image-count-4 img {
+  aspect-ratio: 4 / 3;
+}

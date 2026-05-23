@@ -1,0 +1,37 @@
+@let previewData = preview();
+
+<p-card styleClass="preview-card">
+  <div class="sandbox-label">
+    <i class="pi pi-eye" aria-hidden="true"></i>
+    <span>Sandbox preview - not posted to LinkedIn</span>
+  </div>
+
+  <p-divider />
+
+  <header class="preview-author">
+    <div class="avatar" aria-hidden="true">TI</div>
+    <div class="author-copy">
+      <strong>{{ previewData.authorName }}</strong>
+      <span>{{ previewData.authorHeadline }}</span>
+      <small>{{ previewData.timestampLabel }}</small>
+    </div>
+    <p-tag [value]="previewData.status" [severity]="getSeverity(previewData.status)" />
+  </header>
+
+  @if (previewData.scheduledFor) {
+    <p class="scheduled-date">
+      <i class="pi pi-calendar" aria-hidden="true"></i>
+      Scheduled {{ previewData.scheduledFor | date: 'medium' }}
+    </p>
+  }
+
+  <p class="post-content">{{ previewData.content }}</p>
+
+  @if (previewData.images.length > 0) {
+    <div class="image-grid image-count-{{ previewData.images.length }}">
+      @for (image of previewData.images; track image.id) {
+        <img [src]="image.dataUrl" [alt]="image.fileName" />
+      }
+    </div>
+  }
+</p-card>
