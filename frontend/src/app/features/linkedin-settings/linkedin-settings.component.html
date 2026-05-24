@@ -48,4 +48,51 @@
       and publish audit logs.
     </p>
   </p-card>
+
+  <p-card>
+    <ng-template pTemplate="title">Developer settings</ng-template>
+    <ng-template pTemplate="subtitle">Local testing controls</ng-template>
+
+    <p-message
+      severity="warn"
+      text="Development only. This changes where draft data is read and saved after reload."
+    />
+
+    <div class="status-row">
+      <span>Effective storage mode</span>
+      <p-tag [value]="effectiveStorageMode" [severity]="getStorageSeverity(effectiveStorageMode)" />
+    </div>
+    <div class="status-row">
+      <span>Configured default</span>
+      <p-tag [value]="configuredStorageMode" severity="info" />
+    </div>
+    <div class="status-row">
+      <span>Browser override</span>
+      <p-tag [value]="storageModeOverride ?? 'None'" severity="secondary" />
+    </div>
+
+    <p-divider />
+
+    <div class="developer-actions">
+      <button
+        pButton
+        type="button"
+        label="Use Local Storage"
+        icon="pi pi-database"
+        [severity]="getStorageButtonSeverity('local')"
+        [outlined]="!isStorageModeActive('local')"
+        (click)="useStorageMode('local')"
+      ></button>
+      <button
+        pButton
+        type="button"
+        label="Use Backend API"
+        icon="pi pi-server"
+        [severity]="getStorageButtonSeverity('api')"
+        [outlined]="!isStorageModeActive('api')"
+        (click)="useStorageMode('api')"
+      ></button>
+      <button pButton type="button" label="Clear Override" icon="pi pi-undo" severity="secondary" outlined (click)="clearStorageModeOverride()"></button>
+    </div>
+  </p-card>
 </div>

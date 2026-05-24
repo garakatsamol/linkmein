@@ -35,3 +35,9 @@ p {
   justify-content: space-between;
   padding: 0.5rem 0;
 }
+
+.developer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
