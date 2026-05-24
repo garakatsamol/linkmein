@@ -10,7 +10,10 @@
 </div>
 
 @if (draft$ | async; as draft) {
-  <p-message severity="info" text="Preview only. Real LinkedIn publishing is text-only for now; images are not published yet." />
+  <p-message
+    severity="info"
+    text="Preview only. Real LinkedIn publishing supports text-only posts and posts with one image. Multiple images are not supported yet."
+  />
 
   @if (feedback) {
     <p-message severity="success" [text]="feedback" />
@@ -26,6 +29,10 @@
 
   @if (!isApiMode()) {
     <p-message severity="warn" text="Real LinkedIn publishing requires API storage mode and a backend-saved post." />
+  }
+
+  @if (hasUnsupportedImageCount(draft)) {
+    <p-message severity="warn" [text]="getImagePublishLimitMessage(draft)" />
   }
 
   <div class="publish-actions">
@@ -44,12 +51,12 @@
       icon="pi pi-link"
       severity="secondary"
       outlined
-      [disabled]="isPublishingToLinkedIn || !isApiMode()"
-      (click)="publishToLinkedIn()"
+      [disabled]="isPublishingToLinkedIn || !isApiMode() || hasUnsupportedImageCount(draft)"
+      (click)="publishToLinkedIn(draft)"
     ></button>
   </div>
 
-  <p class="publish-note">LinkedIn publishing sends text only. Attached images stay in LinkMeIn until image publishing is added.</p>
+  <p class="publish-note">{{ getPublishCapabilityMessage(draft) }} Sandbox publish remains separate and is not posted to LinkedIn.</p>
 
   @if (preview$ | async; as preview) {
     <app-linkedin-preview-card [preview]="preview" />

@@ -61,12 +61,17 @@ export class PostPreviewComponent {
     });
   }
 
-  protected publishToLinkedIn(): void {
+  protected publishToLinkedIn(draft: PostDraft): void {
     this.feedback = '';
     this.publishError = '';
 
     if (!this.isApiMode()) {
       this.publishError = 'Real LinkedIn publishing requires API storage mode and a backend-saved post.';
+      return;
+    }
+
+    if (this.hasUnsupportedImageCount(draft)) {
+      this.publishError = this.getImagePublishLimitMessage(draft);
       return;
     }
 
@@ -85,7 +90,7 @@ export class PostPreviewComponent {
       )
       .subscribe({
         next: (result) => {
-          this.feedback = result.message || 'Published to LinkedIn. Images were not published.';
+          this.feedback = result.message || this.getPublishSuccessMessage(draft);
           this.refreshDraft();
         },
         error: (error: unknown) => {
@@ -96,10 +101,32 @@ export class PostPreviewComponent {
 
   protected getPublishedAtMessage(draft: PostDraft): string {
     if (this.isApiMode()) {
-      return `Published to LinkedIn ${this.formatDate(draft.mockPublishedAt)}. Text-only publish; images were not published.`;
+      return `Published to LinkedIn ${this.formatDate(draft.mockPublishedAt)}. ${this.getPublishCapabilityMessage(draft)}`;
     }
 
     return `Sandbox published ${this.formatDate(draft.mockPublishedAt)}. Not posted to LinkedIn.`;
+  }
+
+  protected getPublishCapabilityMessage(draft: PostDraft): string {
+    const imageCount = draft.images.length;
+
+    if (imageCount === 0) {
+      return 'Text-only posts can be published.';
+    }
+
+    if (imageCount === 1) {
+      return 'Posts with one image can be published.';
+    }
+
+    return 'Publishing multiple images is not supported yet.';
+  }
+
+  protected getImagePublishLimitMessage(draft: PostDraft): string {
+    return `This draft has ${draft.images.length} images. Publishing multiple images is not supported yet.`;
+  }
+
+  protected hasUnsupportedImageCount(draft: PostDraft): boolean {
+    return draft.images.length > 1;
   }
 
   protected isApiMode(): boolean {
@@ -119,7 +146,13 @@ export class PostPreviewComponent {
       }
     }
 
-    return 'LinkedIn publish failed. No images were published.';
+    return 'LinkedIn publish failed.';
+  }
+
+  private getPublishSuccessMessage(draft: PostDraft): string {
+    return draft.images.length === 1
+      ? 'Published to LinkedIn with one image.'
+      : 'Published to LinkedIn.';
   }
 
   private refreshDraft(): void {
