@@ -50,13 +50,20 @@ export class ApiDraftStoreService extends DraftStoreService {
   override createDraft(payload: DraftPayload): Observable<PostDraft> {
     return this.http
       .post<ApiPostDto>(this.postsUrl, mapDraftPayloadToCreateApiPostRequest(payload))
-      .pipe(map(mapApiPostToPostDraft));
+      .pipe(
+        switchMap((post) =>
+          this.uploadLocalImages(post.id, payload.images).pipe(switchMap(() => this.getApiPostWithMedia(post.id)))
+        )
+      );
   }
 
   override updateDraft(id: string, payload: DraftPayload): Observable<PostDraft> {
     return this.http
       .put<ApiPostDto>(`${this.postsUrl}/${id}`, mapDraftPayloadToUpdateApiPostRequest(payload))
-      .pipe(map(mapApiPostToPostDraft));
+      .pipe(
+        switchMap(() => this.uploadLocalImages(id, payload.images)),
+        switchMap(() => this.getApiPostWithMedia(id))
+      );
   }
 
   override deleteDraft(id: string): Observable<void> {
@@ -80,5 +87,33 @@ export class ApiDraftStoreService extends DraftStoreService {
       sizeBytes: media.sizeBytes,
       dataUrl: this.apiMedia.getMediaContentUrl(postId, media.id)
     };
+  }
+
+  private getApiPostWithMedia(id: string): Observable<PostDraft> {
+    return this.http.get<ApiPostDto>(`${this.postsUrl}/${id}`).pipe(switchMap((post) => this.mapApiPostWithMedia(post)));
+  }
+
+  private uploadLocalImages(postId: string, images: DraftImage[] | undefined): Observable<unknown> {
+    const localImageFiles = (images ?? [])
+      .filter((image) => image.dataUrl.startsWith('data:'))
+      .map((image) => this.dataUrlToFile(image));
+
+    if (localImageFiles.length === 0) {
+      return of(null);
+    }
+
+    return forkJoin(localImageFiles.map((file) => this.apiMedia.uploadMedia(postId, file)));
+  }
+
+  private dataUrlToFile(image: DraftImage): File {
+    const [, encodedContent = ''] = image.dataUrl.split(',', 2);
+    const binaryContent = atob(encodedContent);
+    const bytes = new Uint8Array(binaryContent.length);
+
+    for (let index = 0; index < binaryContent.length; index++) {
+      bytes[index] = binaryContent.charCodeAt(index);
+    }
+
+    return new File([bytes], image.fileName, { type: image.mimeType });
   }
 }
