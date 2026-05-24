@@ -10,17 +10,20 @@ public class PostPublishingService : IPostPublishingService
 {
     private readonly LinkMeInDbContext _db;
     private readonly ILinkedInPublishingClient _linkedInPublishingClient;
+    private readonly IMediaStorageService _mediaStorage;
     private readonly ITokenEncryptionService _tokenEncryption;
     private readonly LinkedInOptions _linkedInOptions;
 
     public PostPublishingService(
         LinkMeInDbContext db,
         ILinkedInPublishingClient linkedInPublishingClient,
+        IMediaStorageService mediaStorage,
         ITokenEncryptionService tokenEncryption,
         IOptions<LinkedInOptions> linkedInOptions)
     {
         _db = db;
         _linkedInPublishingClient = linkedInPublishingClient;
+        _mediaStorage = mediaStorage;
         _tokenEncryption = tokenEncryption;
         _linkedInOptions = linkedInOptions.Value;
     }
@@ -56,6 +59,22 @@ public class PostPublishingService : IPostPublishingService
             return Failure(400, message);
         }
 
+        var mediaItems = await _db.PostMedia
+            .Where(item => item.PostId == post.Id && item.OwnerId == ownerId)
+            .OrderBy(item => item.CreatedAt)
+            .ToListAsync(cancellationToken);
+
+        if (mediaItems.Count > 1)
+        {
+            const string message = "Publishing multiple images is not supported yet.";
+            await RecordFailureAsync(post, message, "LinkedIn multi-image post publish", cancellationToken);
+            return Failure(400, message);
+        }
+
+        var requestSummary = mediaItems.Count == 1
+            ? "LinkedIn single-image post publish"
+            : "LinkedIn text-only post publish";
+
         var now = DateTimeOffset.UtcNow;
         post.Status = PostStatus.Publishing;
         post.UpdatedAt = now;
@@ -68,19 +87,55 @@ public class PostPublishingService : IPostPublishingService
             OwnerId = ownerId,
             Status = PublishAttemptStatus.Pending,
             AttemptedAt = now,
-            RequestSummary = "LinkedIn text-only post publish"
+            RequestSummary = requestSummary
         };
         _db.PublishAttempts.Add(publishAttempt);
 
         try
         {
             var accessToken = _tokenEncryption.Unprotect(connection.AccessTokenEncrypted);
-            var response = await _linkedInPublishingClient.PublishTextPostAsync(
-                accessToken,
-                connection.LinkedInMemberId,
-                post.Content,
-                _linkedInOptions,
-                cancellationToken);
+            LinkedInPublishResponse response;
+            LinkedInImageUploadResponse? imageUploadResponse = null;
+            if (mediaItems.Count == 1)
+            {
+                var media = mediaItems[0];
+                using var mediaStream = await _mediaStorage.OpenReadAsync(media.StoragePath, cancellationToken);
+                if (mediaStream == null)
+                {
+                    const string message = "Local media file is missing. Re-upload the image before publishing.";
+                    await RecordPublishExceptionAsync(post, publishAttempt, message, cancellationToken);
+                    return Failure(400, message);
+                }
+
+                imageUploadResponse = await _linkedInPublishingClient.UploadImageAsync(
+                    accessToken,
+                    connection.LinkedInMemberId,
+                    mediaStream,
+                    media.ContentType,
+                    media.FileName,
+                    _linkedInOptions,
+                    cancellationToken);
+
+                media.LinkedInAssetUrn = imageUploadResponse.ImageUrn;
+                await _db.SaveChangesAsync(cancellationToken);
+
+                response = await _linkedInPublishingClient.PublishSingleImagePostAsync(
+                    accessToken,
+                    connection.LinkedInMemberId,
+                    post.Content,
+                    imageUploadResponse.ImageUrn,
+                    _linkedInOptions,
+                    cancellationToken);
+            }
+            else
+            {
+                response = await _linkedInPublishingClient.PublishTextPostAsync(
+                    accessToken,
+                    connection.LinkedInMemberId,
+                    post.Content,
+                    _linkedInOptions,
+                    cancellationToken);
+            }
 
             var publishedAt = DateTimeOffset.UtcNow;
             post.Status = PostStatus.Published;
@@ -90,7 +145,9 @@ public class PostPublishingService : IPostPublishingService
 
             publishAttempt.Status = PublishAttemptStatus.Succeeded;
             publishAttempt.LinkedInPostId = response.LinkedInPostId;
-            publishAttempt.ResponseSummary = response.ResponseSummary;
+            publishAttempt.ResponseSummary = imageUploadResponse == null
+                ? response.ResponseSummary
+                : $"{imageUploadResponse.ResponseSummary}; {response.ResponseSummary}";
 
             await _db.SaveChangesAsync(cancellationToken);
 
@@ -114,7 +171,11 @@ public class PostPublishingService : IPostPublishingService
         }
     }
 
-    private async Task RecordFailureAsync(Post post, string message, CancellationToken cancellationToken)
+    private async Task RecordFailureAsync(
+        Post post,
+        string message,
+        string requestSummary,
+        CancellationToken cancellationToken)
     {
         var now = DateTimeOffset.UtcNow;
         post.Status = PostStatus.Failed;
@@ -127,9 +188,14 @@ public class PostPublishingService : IPostPublishingService
             Status = PublishAttemptStatus.Failed,
             AttemptedAt = now,
             ErrorMessage = message,
-            RequestSummary = "LinkedIn text-only post publish"
+            RequestSummary = requestSummary
         });
         await _db.SaveChangesAsync(cancellationToken);
+    }
+
+    private async Task RecordFailureAsync(Post post, string message, CancellationToken cancellationToken)
+    {
+        await RecordFailureAsync(post, message, "LinkedIn text-only post publish", cancellationToken);
     }
 
     private async Task RecordPublishExceptionAsync(
