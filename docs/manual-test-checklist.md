@@ -13,7 +13,7 @@ Use this checklist for the Phase 1 Angular MVP.
 ## Images
 
 - Add one valid image to a draft.
-- Add multiple valid images up to the four-image limit.
+- Confirm adding another image is blocked with "Only one image is supported for now."
 - Confirm unsupported image types show validation.
 - Confirm images over 4 MB show validation.
 - Remove an image from a draft.

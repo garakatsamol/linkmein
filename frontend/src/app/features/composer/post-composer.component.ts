@@ -14,7 +14,7 @@ import { DraftStoreService } from '../../core/services/draft-store.service';
 import { ImagePreviewService } from '../../core/services/image-preview.service';
 
 const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-const MAX_IMAGE_COUNT = 4;
+const MAX_IMAGE_COUNT = 1;
 const MAX_IMAGE_SIZE_BYTES = 4 * 1024 * 1024;
 const SAVE_TIMEOUT_MS = 60000;
 
@@ -128,7 +128,7 @@ export class PostComposerComponent implements OnInit {
 
     for (const file of selectedFiles) {
       if (this.images.length >= MAX_IMAGE_COUNT) {
-        this.imageValidationMessages.push(`You can attach up to ${MAX_IMAGE_COUNT} images per draft.`);
+        this.imageValidationMessages.push('Only one image is supported for now.');
         this.refreshView();
         break;
       }

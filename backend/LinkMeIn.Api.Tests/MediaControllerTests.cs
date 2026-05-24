@@ -167,26 +167,23 @@ namespace LinkMeIn.Api.Tests
                 0x42, 0x60, 0x82
             };
 
-            // Upload 4 valid images (should succeed)
-            for (int i = 0; i < 4; i++)
-            {
-                var imageBytes = MakePng(i);
-                var imageContent = new ByteArrayContent(imageBytes);
-                imageContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/png");
-                var form = new MultipartFormDataContent();
-                form.Add(imageContent, "file", $"img{i}.png");
-                var uploadResp = await client.PostAsync($"/api/posts/{createdPost.Id}/media", form);
-                Assert.Equal(HttpStatusCode.Created, uploadResp.StatusCode);
-            }
+            // Upload the first valid image (should succeed)
+            var firstImageBytes = MakePng(1);
+            var firstImageContent = new ByteArrayContent(firstImageBytes);
+            firstImageContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/png");
+            var firstForm = new MultipartFormDataContent();
+            firstForm.Add(firstImageContent, "file", "img1.png");
+            var firstUploadResp = await client.PostAsync($"/api/posts/{createdPost.Id}/media", firstForm);
+            Assert.Equal(HttpStatusCode.Created, firstUploadResp.StatusCode);
 
-            // Upload 5th image (should fail)
-            var fifthImageBytes = MakePng(99);
-            var fifthImageContent = new ByteArrayContent(fifthImageBytes);
-            fifthImageContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/png");
-            var fifthForm = new MultipartFormDataContent();
-            fifthForm.Add(fifthImageContent, "file", "img5.png");
-            var fifthUploadResp = await client.PostAsync($"/api/posts/{createdPost.Id}/media", fifthForm);
-            Assert.Equal(HttpStatusCode.BadRequest, fifthUploadResp.StatusCode);
+            // Upload the second image (should fail)
+            var secondImageBytes = MakePng(2);
+            var secondImageContent = new ByteArrayContent(secondImageBytes);
+            secondImageContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/png");
+            var secondForm = new MultipartFormDataContent();
+            secondForm.Add(secondImageContent, "file", "img2.png");
+            var secondUploadResp = await client.PostAsync($"/api/posts/{createdPost.Id}/media", secondForm);
+            Assert.Equal(HttpStatusCode.BadRequest, secondUploadResp.StatusCode);
         }
         [Fact]
         public async Task UploadMedia_OversizedImage_Returns400()

@@ -29,8 +29,8 @@
     <div class="image-section">
       <div class="image-section-header">
         <div>
-          <label for="images">Images</label>
-          <p>Up to {{ maxImageCount }} local previews. JPEG, PNG, or WebP. {{ maxImageSizeLabel }} per image.</p>
+          <label for="images">Image</label>
+          <p>One image per post is supported for now. JPEG, PNG, or WebP. {{ maxImageSizeLabel }} per image.</p>
         </div>
         <span>{{ images.length }}/{{ maxImageCount }}</span>
       </div>
@@ -39,11 +39,14 @@
         id="images"
         class="file-input"
         type="file"
-        multiple
         [accept]="acceptedImageTypes"
         [disabled]="images.length >= maxImageCount"
         (change)="addImages($event)"
       />
+
+      @if (images.length >= maxImageCount) {
+        <p-message severity="info" text="Only one image is supported for now." />
+      }
 
       @for (message of imageValidationMessages; track message) {
         <p-message severity="error" [text]="message" />
