@@ -30,6 +30,22 @@ export class PostComposerComponent implements OnInit {
   protected handleUseAiSuggestion(text: string): void {
     this.form.controls.content.setValue(text);
     this.form.controls.content.markAsDirty();
+    this.form.controls.content.markAsTouched();
+    // Auto-fill title if empty
+    const currentTitle = this.form.controls.title.value?.trim();
+    if (!currentTitle) {
+      // Use first non-empty line of suggested text as fallback title
+      const firstLine = text.split('\n').map(l => l.trim()).find(l => l.length > 0) || '';
+      // Truncate to 100 chars (adjust if your title max length differs)
+      const truncated = firstLine.slice(0, 100);
+      if (truncated) {
+        this.form.controls.title.setValue(truncated);
+        this.form.controls.title.markAsDirty();
+        this.form.controls.title.markAsTouched();
+        this.form.controls.title.updateValueAndValidity();
+      }
+    }
+    this.form.controls.content.updateValueAndValidity();
     this.refreshView();
   }
   private readonly draftStore = inject(DraftStoreService);
@@ -90,6 +106,8 @@ export class PostComposerComponent implements OnInit {
 
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      this.loadError = 'Please fill in the required fields before saving.';
+      this.refreshView();
       return;
     }
 

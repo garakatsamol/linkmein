@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
@@ -28,7 +28,10 @@ export class AiAssistPanelComponent {
 
   @Output() useSuggestion = new EventEmitter<string>();
 
-  constructor(private readonly aiService: ApiAiService) {}
+  constructor(
+    private readonly aiService: ApiAiService,
+    private readonly cdr: ChangeDetectorRef
+  ) {}
 
   generateSuggestion() {
     this.error = '';
@@ -45,14 +48,19 @@ export class AiAssistPanelComponent {
     this.loading = true;
     this.aiService.generatePostSuggestion(req)
       .pipe(
-        finalize(() => { this.loading = false; })
+        finalize(() => {
+          this.loading = false;
+          this.cdr.detectChanges();
+        })
       )
       .subscribe({
         next: (res: GeneratePostSuggestionResponse) => {
           this.suggestion = res;
+          this.cdr.detectChanges();
         },
         error: (err) => {
           this.error = err?.error?.message || 'Failed to generate suggestion.';
+          this.cdr.detectChanges();
         }
       });
   }
