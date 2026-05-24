@@ -205,8 +205,8 @@ namespace LinkMeIn.Api.Tests
             var createdPost = await createResp.Content.ReadFromJsonAsync<LinkMeIn.Api.Contracts.Posts.PostDto>();
             Assert.NotNull(createdPost);
 
-            // Create a fake PNG image in memory larger than 2MB (2097152 bytes)
-            var oversizedLength = 2097152 + 1;
+            // Create a fake PNG image in memory larger than 4MB (4194304 bytes)
+            var oversizedLength = 4194304 + 1;
             var imageBytes = new byte[oversizedLength];
             // PNG header
             imageBytes[0] = 0x89;

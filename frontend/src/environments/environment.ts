@@ -1,4 +1,4 @@
 export const environment = {
-  apiBaseUrl: 'http://localhost:5062',
+  apiBaseUrl: 'https://localhost:7161',
   storageMode: 'local'
 } as const;

@@ -1,6 +1,6 @@
 <div class="page-heading">
   <h2>LinkedIn settings</h2>
-  <p>Connection and production publishing are placeholders during Phase 1.</p>
+  <p>Manage the server-side LinkedIn connection used by future publishing features.</p>
 </div>
 
 <p-message
@@ -11,17 +11,77 @@
 <div class="settings-grid">
   <p-card>
     <ng-template pTemplate="title">LinkedIn connection</ng-template>
-    <ng-template pTemplate="subtitle">Not implemented in Phase 1</ng-template>
+    <ng-template pTemplate="subtitle">Backend OAuth connection</ng-template>
 
     <p>
-      LinkedIn OAuth will require a backend to safely handle redirects, token exchange, token storage, and API calls.
-      Angular must not store LinkedIn client secrets.
+      OAuth redirects and token storage are handled by the backend. Angular never receives LinkedIn access tokens or
+      client secrets.
     </p>
+
+    @if (connectionFeedback) {
+      <p-message severity="success" [text]="connectionFeedback" />
+    }
+
+    @if (connectionError) {
+      <p-message severity="error" [text]="connectionError" />
+    }
+
+    @if (linkedInStatus?.message) {
+      <p-message severity="info" [text]="linkedInStatus?.message ?? ''" />
+    }
 
     <p-divider />
 
-    <button pButton type="button" label="Connect LinkedIn" icon="pi pi-lock" disabled></button>
-    <p class="helper-copy">Disabled until the backend OAuth flow is explicitly implemented.</p>
+    <div class="status-row">
+      <span>Connection status</span>
+      <p-tag [value]="getConnectionLabel()" [severity]="getConnectionSeverity()" />
+    </div>
+    @if (linkedInStatus?.connected) {
+      <div class="status-row">
+        <span>Connected at</span>
+        <strong>{{ linkedInStatus?.connectedAt ? (linkedInStatus?.connectedAt | date: 'medium') : 'Unknown' }}</strong>
+      </div>
+      <div class="status-row">
+        <span>Token expires</span>
+        <strong>{{
+          linkedInStatus?.accessTokenExpiresAt ? (linkedInStatus?.accessTokenExpiresAt | date: 'medium') : 'Unknown'
+        }}</strong>
+      </div>
+      @if (linkedInStatus?.displayName) {
+        <div class="status-row">
+          <span>Profile</span>
+          <strong>{{ linkedInStatus?.displayName }}</strong>
+        </div>
+      }
+      @if (linkedInStatus?.email) {
+        <div class="status-row">
+          <span>Email</span>
+          <strong>{{ linkedInStatus?.email }}</strong>
+        </div>
+      }
+    }
+
+    <div class="connection-actions">
+      <button
+        pButton
+        type="button"
+        label="Connect LinkedIn"
+        icon="pi pi-link"
+        [disabled]="isLoadingConnection || (!connectionError && linkedInStatus?.connected)"
+        (click)="connectLinkedIn()"
+      ></button>
+      <button
+        pButton
+        type="button"
+        label="Disconnect"
+        icon="pi pi-times"
+        severity="secondary"
+        outlined
+        [disabled]="isLoadingConnection || isDisconnecting || !linkedInStatus?.connected"
+        (click)="disconnectLinkedIn()"
+      ></button>
+    </div>
+    <p class="helper-copy">Real publishing is still disabled. This only manages the backend connection state.</p>
   </p-card>
 
   <p-card>
@@ -38,7 +98,7 @@
     </div>
     <div class="status-row">
       <span>LinkedIn API access</span>
-      <p-tag value="Not configured" severity="warn" />
+      <p-tag [value]="getLinkedInApiAccessLabel()" [severity]="getLinkedInApiAccessSeverity()" />
     </div>
 
     <p-divider />
