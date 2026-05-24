@@ -10,7 +10,7 @@
 </div>
 
 @if (draft$ | async; as draft) {
-  <p-message severity="info" text="Sandbox only - Not posted to LinkedIn." />
+  <p-message severity="info" text="Preview only. Real LinkedIn publishing is text-only for now; images are not published yet." />
 
   @if (feedback) {
     <p-message severity="success" [text]="feedback" />
@@ -21,7 +21,11 @@
   }
 
   @if (draft.mockPublishedAt) {
-    <p-message severity="success" [text]="'Sandbox published ' + (draft.mockPublishedAt | date: 'medium') + '. Not posted to LinkedIn.'" />
+    <p-message severity="success" [text]="getPublishedAtMessage(draft)" />
+  }
+
+  @if (!isApiMode()) {
+    <p-message severity="warn" text="Real LinkedIn publishing requires API storage mode and a backend-saved post." />
   }
 
   <div class="publish-actions">
@@ -36,13 +40,16 @@
     <button
       pButton
       type="button"
-      label="Publish to LinkedIn"
-      icon="pi pi-lock"
+      [label]="isPublishingToLinkedIn ? 'Publishing...' : 'Publish to LinkedIn'"
+      icon="pi pi-link"
       severity="secondary"
       outlined
-      disabled
+      [disabled]="isPublishingToLinkedIn || !isApiMode()"
+      (click)="publishToLinkedIn()"
     ></button>
   </div>
+
+  <p class="publish-note">LinkedIn publishing sends text only. Attached images stay in LinkMeIn until image publishing is added.</p>
 
   @if (preview$ | async; as preview) {
     <app-linkedin-preview-card [preview]="preview" />
