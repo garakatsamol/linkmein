@@ -10,6 +10,8 @@
     <p-message severity="error" [text]="loadError" />
   }
 
+  <app-ai-assist-panel (useSuggestion)="handleUseAiSuggestion($event)"></app-ai-assist-panel>
+
   <form class="composer-form" [formGroup]="form" (ngSubmit)="saveDraft()">
     <label for="title">Title</label>
     <input id="title" pInputText type="text" formControlName="title" autocomplete="off" />

@@ -1,0 +1,22 @@
+.ai-assist-panel {
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  background: #fafbfc;
+}
+.field {
+  margin-bottom: 1rem;
+}
+.field-row {
+  display: flex;
+  gap: 1.5rem;
+}
+.loading {
+  color: #888;
+  margin-top: 0.5rem;
+}
+.error {
+  color: #c00;
+  margin-top: 0.5rem;
+}

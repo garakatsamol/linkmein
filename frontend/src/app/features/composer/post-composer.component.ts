@@ -6,6 +6,7 @@ import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { TextareaModule } from 'primeng/textarea';
+import { AiAssistPanelComponent } from './ai-assist-panel.component';
 import { finalize, take, timeout } from 'rxjs';
 
 import { DraftImage } from '../../core/models/draft-image.model';
@@ -20,11 +21,17 @@ const SAVE_TIMEOUT_MS = 60000;
 
 @Component({
   selector: 'app-post-composer',
-  imports: [ButtonModule, CardModule, InputTextModule, MessageModule, ReactiveFormsModule, RouterLink, TextareaModule],
+  imports: [ButtonModule, CardModule, InputTextModule, MessageModule, ReactiveFormsModule, RouterLink, TextareaModule, AiAssistPanelComponent],
   templateUrl: './post-composer.component.html',
   styleUrl: './post-composer.component.scss'
 })
 export class PostComposerComponent implements OnInit {
+  // Called when AI Assist panel emits a suggestion to use
+  protected handleUseAiSuggestion(text: string): void {
+    this.form.controls.content.setValue(text);
+    this.form.controls.content.markAsDirty();
+    this.refreshView();
+  }
   private readonly draftStore = inject(DraftStoreService);
   private readonly formBuilder = inject(FormBuilder);
   private readonly imagePreview = inject(ImagePreviewService);

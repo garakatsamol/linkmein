@@ -1,0 +1,21 @@
+<section class="ai-assist-panel">
+  <h3>AI Assist</h3>
+  <div class="field">
+    <label for="ai-idea">Post idea</label>
+    <textarea id="ai-idea" pTextarea [(ngModel)]="idea" rows="3" placeholder="Describe your post idea..."></textarea>
+  </div>
+  <div class="field">
+    <label for="ai-tone">Tone</label>
+    <select id="ai-tone" [(ngModel)]="tone">
+      <option *ngFor="let t of tones" [value]="t.value" [selected]="tone === t.value">{{ t.label }}</option>
+    </select>
+  </div>
+  <button pButton type="button" label="Generate suggestion" (click)="generateSuggestion()" [disabled]="loading"></button>
+  <div *ngIf="loading" class="loading">Generating...</div>
+  <div *ngIf="error" class="error">{{ error }}</div>
+  <div *ngIf="suggestion">
+    <label>Suggested text</label>
+    <textarea pTextarea [value]="suggestion.suggestedText" readonly rows="5"></textarea>
+    <button pButton type="button" label="Use this text" (click)="handleUseSuggestion()"></button>
+  </div>
+</section>
