@@ -84,7 +84,7 @@ Configure these via user secrets, environment variables, or a deployment secret 
 For local OAuth testing, configure the LinkedIn Developer Portal redirect URL to exactly match `LinkedIn__RedirectUri`, for example:
 
 ```text
-https://localhost:7001/api/linkedin/oauth/callback
+https://localhost:7161/api/linkedin/oauth/callback
 ```
 
 The current local token protection uses ASP.NET Core Data Protection. Production deployments should use managed key storage and persistent key rings. LinkedIn tokens must remain server-side only. Angular must never store LinkedIn client secrets or access tokens.
