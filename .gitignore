@@ -9,3 +9,6 @@ obj/
 
 # Environment overrides
 *.Development.local.json
+
+# Local backend media uploads
+backend/LinkMeIn.Api/App_Data/
