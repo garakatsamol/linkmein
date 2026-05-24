@@ -6,6 +6,7 @@ import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { TextareaModule } from 'primeng/textarea';
+import { finalize, take, timeout } from 'rxjs';
 
 import { DraftImage } from '../../core/models/draft-image.model';
 import { PostDraft } from '../../core/models/post-draft.model';
@@ -15,6 +16,7 @@ import { ImagePreviewService } from '../../core/services/image-preview.service';
 const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_IMAGE_COUNT = 4;
 const MAX_IMAGE_SIZE_BYTES = 4 * 1024 * 1024;
+const SAVE_TIMEOUT_MS = 60000;
 
 @Component({
   selector: 'app-post-composer',
@@ -33,6 +35,7 @@ export class PostComposerComponent implements OnInit {
   protected feedback = '';
   protected images: DraftImage[] = [];
   protected imageValidationMessages: string[] = [];
+  protected isSaving = false;
   protected loadError = '';
   protected readonly acceptedImageTypes = ACCEPTED_IMAGE_TYPES.join(',');
   protected readonly maxImageCount = MAX_IMAGE_COUNT;
@@ -68,6 +71,10 @@ export class PostComposerComponent implements OnInit {
   }
 
   protected saveDraft(): void {
+    if (this.isSaving) {
+      return;
+    }
+
     this.feedback = '';
     this.loadError = '';
 
@@ -86,13 +93,18 @@ export class PostComposerComponent implements OnInit {
       ? this.draftStore.updateDraft(this.draftId, payload)
       : this.draftStore.createDraft(payload);
 
-    request$.subscribe({
+    this.isSaving = true;
+
+    request$.pipe(take(1), timeout({ first: SAVE_TIMEOUT_MS }), finalize(() => this.finishSaving())).subscribe({
       next: (draft) => {
         this.draftId = draft.id;
+        this.images = draft.images;
         this.feedback = 'Draft saved.';
+        this.finishSaving();
         void this.router.navigate(['/composer', draft.id], { replaceUrl: true });
       },
       error: () => {
+        this.finishSaving();
         this.loadError = 'Unable to save this draft.';
       }
     });
@@ -148,6 +160,10 @@ export class PostComposerComponent implements OnInit {
       scheduledFor: draft.scheduledFor ?? ''
     });
     this.images = draft.images;
+  }
+
+  private finishSaving(): void {
+    this.isSaving = false;
   }
 
   private toDateTimeLocalValue(value: string): string {

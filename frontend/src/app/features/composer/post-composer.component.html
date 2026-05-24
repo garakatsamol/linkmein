@@ -75,7 +75,13 @@
     </div>
 
     <div class="form-actions">
-      <button pButton type="submit" label="Save draft" icon="pi pi-save"></button>
+      <button
+        pButton
+        type="submit"
+        [label]="isSaving ? 'Saving...' : 'Save draft'"
+        icon="pi pi-save"
+        [disabled]="isSaving"
+      ></button>
       @if (draftId) {
         <a pButton [routerLink]="['/posts', draftId, 'preview']" label="Preview" icon="pi pi-eye" severity="secondary"></a>
       }
