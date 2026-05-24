@@ -1,5 +1,8 @@
+
 using LinkMeIn.Api.Contracts.Ai;
+using LinkMeIn.Api.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace LinkMeIn.Api.Controllers
 {
@@ -7,34 +10,22 @@ namespace LinkMeIn.Api.Controllers
     [Route("api/ai/post-suggestions")]
     public class AiController : ControllerBase
     {
-        [HttpPost]
-        public ActionResult<GeneratePostSuggestionResponse> GeneratePostSuggestion([FromBody] GeneratePostSuggestionRequest request)
+        private readonly IPostSuggestionService _postSuggestionService;
+
+        public AiController(IPostSuggestionService postSuggestionService)
         {
+            _postSuggestionService = postSuggestionService;
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<GeneratePostSuggestionResponse>> GeneratePostSuggestion([FromBody] GeneratePostSuggestionRequest request)
+        {
+            var response = await _postSuggestionService.GeneratePostSuggestionAsync(request);
             if (string.IsNullOrWhiteSpace(request.Idea))
             {
-                return BadRequest(new GeneratePostSuggestionResponse
-                {
-                    SuggestedText = string.Empty,
-                    Message = "Idea is required."
-                });
+                return BadRequest(response);
             }
-
-            var isGreek = (request.Language?.Trim().ToLowerInvariant() == "el" || request.Language?.Trim().ToLowerInvariant() == "greek");
-            string suggestion;
-            if (isGreek)
-            {
-                suggestion = $"Ιδέα: {request.Idea}\n\nΑκολουθεί μια πρόταση ανάρτησης με τόνο '{request.Tone ?? "ουδέτερο"}':\nΑυτή είναι μια προτεινόμενη ανάρτηση για το LinkedIn βασισμένη στην ιδέα σας.";
-            }
-            else
-            {
-                suggestion = $"Idea: {request.Idea}\n\nHere is a suggested LinkedIn post in a '{request.Tone ?? "neutral"}' tone:\nThis is a suggested post for LinkedIn based on your idea.";
-            }
-
-            return Ok(new GeneratePostSuggestionResponse
-            {
-                SuggestedText = suggestion,
-                Message = null
-            });
+            return Ok(response);
         }
     }
 }

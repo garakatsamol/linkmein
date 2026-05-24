@@ -4,9 +4,13 @@ using LinkMeIn.Api.Services;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 
-const string AngularDevelopmentCorsPolicy = "AngularDevelopment";
+
 
 var builder = WebApplication.CreateBuilder(args);
+// Register AI suggestion service abstraction
+builder.Services.AddScoped<IPostSuggestionService, MockPostSuggestionService>();
+
+const string AngularDevelopmentCorsPolicy = "AngularDevelopment";
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
