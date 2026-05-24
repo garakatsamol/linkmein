@@ -1,4 +1,5 @@
 using System.Security.Cryptography;
+using System.Text.Json;
 using LinkMeIn.Api.Contracts.LinkedIn;
 using LinkMeIn.Api.Data;
 using LinkMeIn.Api.Entities;
@@ -158,6 +159,7 @@ public class LinkedInController : ControllerBase
             RefreshTokenEncrypted = string.IsNullOrWhiteSpace(tokenResponse.RefreshToken)
                 ? null
                 : _tokenEncryption.Protect(tokenResponse.RefreshToken),
+            LinkedInMemberId = TryGetLinkedInMemberUrn(tokenResponse.IdToken),
             AccessTokenExpiresAt = now.AddSeconds(Math.Max(tokenResponse.ExpiresIn, 0)),
             Scopes = scopes,
             ConnectedAt = now
@@ -211,5 +213,60 @@ public class LinkedInController : ControllerBase
     private static IReadOnlyList<string> SplitScopes(string scopes)
     {
         return scopes.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+    }
+
+    private static string? TryGetLinkedInMemberUrn(string? idToken)
+    {
+        if (string.IsNullOrWhiteSpace(idToken))
+        {
+            return null;
+        }
+
+        var tokenParts = idToken.Split('.');
+        if (tokenParts.Length < 2)
+        {
+            return null;
+        }
+
+        try
+        {
+            var payloadBytes = WebEncoders.Base64UrlDecode(tokenParts[1]);
+            using var payload = JsonDocument.Parse(payloadBytes);
+
+            if (!payload.RootElement.TryGetProperty("sub", out var subjectElement))
+            {
+                return null;
+            }
+
+            var subject = subjectElement.GetString();
+            if (string.IsNullOrWhiteSpace(subject))
+            {
+                return null;
+            }
+
+            if (subject.StartsWith("urn:li:person:", StringComparison.OrdinalIgnoreCase))
+            {
+                return subject;
+            }
+
+            if (subject.StartsWith("urn:", StringComparison.OrdinalIgnoreCase))
+            {
+                return null;
+            }
+
+            return $"urn:li:person:{subject}";
+        }
+        catch (JsonException)
+        {
+            return null;
+        }
+        catch (FormatException)
+        {
+            return null;
+        }
+        catch (ArgumentException)
+        {
+            return null;
+        }
     }
 }

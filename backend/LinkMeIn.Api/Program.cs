@@ -14,10 +14,12 @@ builder.Services.Configure<MediaStorageOptions>(builder.Configuration.GetSection
 builder.Services.Configure<LinkedInOptions>(builder.Configuration.GetSection("LinkedIn"));
 builder.Services.AddScoped<IMediaStorageService, LocalMediaStorageService>();
 builder.Services.AddHttpClient<ILinkedInOAuthClient, LinkedInOAuthClient>();
+builder.Services.AddHttpClient<ILinkedInPublishingClient, LinkedInPublishingClient>();
 builder.Services
     .AddDataProtection()
     .SetApplicationName("LinkMeIn.Api");
 builder.Services.AddScoped<ITokenEncryptionService, DataProtectionTokenEncryptionService>();
+builder.Services.AddScoped<IPostPublishingService, PostPublishingService>();
 
 builder.Services.AddCors(options =>
 {

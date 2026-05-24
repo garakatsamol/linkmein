@@ -1,6 +1,8 @@
 using LinkMeIn.Api.Contracts.Posts;
+using LinkMeIn.Api.Contracts.Publishing;
 using LinkMeIn.Api.Data;
 using LinkMeIn.Api.Entities;
+using LinkMeIn.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,11 +13,32 @@ namespace LinkMeIn.Api.Controllers
     public class PostsController : ControllerBase
     {
         private readonly LinkMeInDbContext _db;
+        private readonly IPostPublishingService _postPublishingService;
         private const string DefaultOwnerId = "default-owner";
 
-        public PostsController(LinkMeInDbContext db)
+        public PostsController(LinkMeInDbContext db, IPostPublishingService postPublishingService)
         {
             _db = db;
+            _postPublishingService = postPublishingService;
+        }
+
+        [HttpPost("{id}/publish")]
+        public async Task<ActionResult<PublishPostResponse>> Publish(Guid id, CancellationToken cancellationToken)
+        {
+            var result = await _postPublishingService.PublishTextPostAsync(id, DefaultOwnerId, cancellationToken);
+            var response = new PublishPostResponse
+            {
+                Success = result.Success,
+                Message = result.Message,
+                LinkedInPostId = result.LinkedInPostId
+            };
+
+            if (result.Success)
+            {
+                return Ok(response);
+            }
+
+            return StatusCode(result.StatusCode, response);
         }
 
         [HttpDelete("{id}")]
