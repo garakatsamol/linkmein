@@ -61,6 +61,7 @@ export class ApiDraftStoreService extends DraftStoreService {
     return this.http
       .put<ApiPostDto>(`${this.postsUrl}/${id}`, mapDraftPayloadToUpdateApiPostRequest(payload))
       .pipe(
+        switchMap(() => this.deleteRemovedImages(id, payload.removedImageIds)),
         switchMap(() => this.uploadLocalImages(id, payload.images)),
         switchMap(() => this.getApiPostWithMedia(id))
       );
@@ -103,6 +104,16 @@ export class ApiDraftStoreService extends DraftStoreService {
     }
 
     return forkJoin(localImageFiles.map((file) => this.apiMedia.uploadMedia(postId, file)));
+  }
+
+  private deleteRemovedImages(postId: string, imageIds: string[] | undefined): Observable<unknown> {
+    const uniqueImageIds = [...new Set(imageIds ?? [])];
+
+    if (uniqueImageIds.length === 0) {
+      return of(null);
+    }
+
+    return forkJoin(uniqueImageIds.map((imageId) => this.apiMedia.deleteMedia(postId, imageId)));
   }
 
   private dataUrlToFile(image: DraftImage): File {

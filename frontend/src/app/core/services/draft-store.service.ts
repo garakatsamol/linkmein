@@ -8,6 +8,7 @@ export interface DraftPayload {
   content: string;
   images?: DraftImage[];
   mockPublishedAt?: string;
+  removedImageIds?: string[];
   scheduledFor?: string;
   status?: PostStatus;
 }
