@@ -1,4 +1,7 @@
 using LinkMeIn.Api.Data;
+using LinkMeIn.Api.Options;
+using LinkMeIn.Api.Services;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 
 const string AngularDevelopmentCorsPolicy = "AngularDevelopment";
@@ -7,10 +10,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
-    
-    builder.Services.Configure<LinkMeIn.Api.Options.MediaStorageOptions>(
-        builder.Configuration.GetSection("MediaStorage"));
-    builder.Services.AddScoped<LinkMeIn.Api.Services.IMediaStorageService, LinkMeIn.Api.Services.LocalMediaStorageService>();
+builder.Services.Configure<MediaStorageOptions>(builder.Configuration.GetSection("MediaStorage"));
+builder.Services.Configure<LinkedInOptions>(builder.Configuration.GetSection("LinkedIn"));
+builder.Services.AddScoped<IMediaStorageService, LocalMediaStorageService>();
+builder.Services.AddHttpClient<ILinkedInOAuthClient, LinkedInOAuthClient>();
+builder.Services
+    .AddDataProtection()
+    .SetApplicationName("LinkMeIn.Api");
+builder.Services.AddScoped<ITokenEncryptionService, DataProtectionTokenEncryptionService>();
 
 builder.Services.AddCors(options =>
 {
