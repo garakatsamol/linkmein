@@ -3,13 +3,16 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { TextareaModule } from 'primeng/textarea';
+import { CardModule } from 'primeng/card';
+import { MessageModule } from 'primeng/message';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ApiAiService, GeneratePostSuggestionRequest, GeneratePostSuggestionResponse } from '../../core/services/api-ai.service';
 import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-ai-assist-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule, ButtonModule, TextareaModule],
+  imports: [CommonModule, FormsModule, ButtonModule, TextareaModule, CardModule, MessageModule, ProgressSpinnerModule],
   templateUrl: './ai-assist-panel.component.html',
   styleUrl: './ai-assist-panel.component.scss'
 })

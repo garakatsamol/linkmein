@@ -1,21 +1,37 @@
-<section class="ai-assist-panel">
-  <h3>AI Assist</h3>
-  <div class="field">
-    <label for="ai-idea">Post idea</label>
-    <textarea id="ai-idea" pTextarea [(ngModel)]="idea" rows="3" placeholder="Describe your post idea..."></textarea>
+<p-card class="ai-assist-panel" styleClass="ai-assist-card">
+  <ng-template pTemplate="header">
+    <div class="ai-assist-header">
+      <span class="ai-assist-title">AI Assist</span>
+    </div>
+  </ng-template>
+  <div class="ai-assist-helper">Paste rough ideas, bullets, or messy notes. AI Assist will turn them into a LinkedIn draft.</div>
+  <div class="ai-assist-fields">
+    <div class="ai-assist-field">
+      <label for="ai-idea" class="ai-label">Raw thoughts / notes</label>
+      <textarea id="ai-idea" pTextarea [(ngModel)]="idea" rows="3" placeholder="Example: AI adoption is not about tools... teams need workflow clarity... juniors need guidance..." class="ai-textarea"></textarea>
+    </div>
+    <div class="ai-assist-field ai-tone-row">
+      <label for="ai-tone" class="ai-label">Tone</label>
+      <select id="ai-tone" [(ngModel)]="tone" class="ai-select">
+        <option *ngFor="let t of tones" [value]="t.value">{{ t.label }}</option>
+      </select>
+    </div>
+    <button pButton type="button" [label]="loading ? 'Generating...' : 'Generate suggestion'" (click)="generateSuggestion()" [disabled]="loading" class="ai-generate-btn"></button>
   </div>
-  <div class="field">
-    <label for="ai-tone">Tone</label>
-    <select id="ai-tone" [(ngModel)]="tone">
-      <option *ngFor="let t of tones" [value]="t.value" [selected]="tone === t.value">{{ t.label }}</option>
-    </select>
+  <div *ngIf="loading || suggestion" class="ai-result-area">
+    <ng-container *ngIf="loading; else suggestionBlock">
+      <div class="ai-loading-group">
+        <p-progressSpinner styleClass="ai-spinner-main" [style]="{width: '2.5em', height: '2.5em'}" strokeWidth="4"></p-progressSpinner>
+        <span class="ai-loading-text">Generating your draft with local AI...</span>
+      </div>
+    </ng-container>
+    <ng-template #suggestionBlock>
+      <div class="ai-suggestion-area">
+        <label class="ai-label">Suggested text</label>
+        <textarea pTextarea [value]="suggestion?.suggestedText" readonly rows="5" class="ai-suggestion-text"></textarea>
+        <button pButton type="button" label="Use this text" (click)="handleUseSuggestion()" class="ai-use-btn"></button>
+      </div>
+    </ng-template>
   </div>
-  <button pButton type="button" label="Generate suggestion" (click)="generateSuggestion()" [disabled]="loading"></button>
-  <div *ngIf="loading" class="loading">Generating...</div>
-  <div *ngIf="error" class="error">{{ error }}</div>
-  <div *ngIf="suggestion">
-    <label>Suggested text</label>
-    <textarea pTextarea [value]="suggestion.suggestedText" readonly rows="5"></textarea>
-    <button pButton type="button" label="Use this text" (click)="handleUseSuggestion()"></button>
-  </div>
-</section>
+  <p-message *ngIf="error" severity="error" text="{{ error }}" class="ai-error"></p-message>
+</p-card>

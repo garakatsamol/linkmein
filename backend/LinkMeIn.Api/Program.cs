@@ -6,9 +6,18 @@ using Microsoft.EntityFrameworkCore;
 
 
 
+
 var builder = WebApplication.CreateBuilder(args);
 // Register AI suggestion service abstraction
-builder.Services.AddScoped<IPostSuggestionService, MockPostSuggestionService>();
+var aiProvider = builder.Configuration["Ai:Provider"] ?? "Mock";
+if (string.Equals(aiProvider, "Ollama", StringComparison.OrdinalIgnoreCase))
+{
+    builder.Services.AddScoped<IPostSuggestionService, OllamaPostSuggestionService>();
+}
+else
+{
+    builder.Services.AddScoped<IPostSuggestionService, MockPostSuggestionService>();
+}
 
 const string AngularDevelopmentCorsPolicy = "AngularDevelopment";
 
