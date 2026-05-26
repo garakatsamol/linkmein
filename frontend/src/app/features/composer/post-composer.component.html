@@ -1,6 +1,6 @@
 <p-card>
   <ng-template pTemplate="title">{{ draftId ? 'Edit draft' : 'New draft' }}</ng-template>
-  <ng-template pTemplate="subtitle">Save post copy and local image previews. Publishing comes later.</ng-template>
+  <ng-template pTemplate="subtitle">Draft post copy, use AI Assist, and attach one optional image.</ng-template>
 
   @if (feedback) {
     <p-message severity="success" [text]="feedback" />

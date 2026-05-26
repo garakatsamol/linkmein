@@ -1,7 +1,7 @@
 # LinkMeIn MVP Plan
 
-Phase 1 is Angular-only and local-first.
+LinkMeIn started as an Angular-only local-first MVP and now includes a backend API foundation.
 
-The MVP will provide a dashboard, post calendar, post list, post composer, multiple local image previews, a LinkedIn-style sandbox preview, local draft storage, mock publishing, and disabled placeholders for LinkedIn connection and real publishing.
+The current MVP provides a dashboard, post calendar, post list, post composer, one optional image per post, AI Assist, a LinkedIn-style sandbox preview, local draft storage, backend API mode, LinkedIn OAuth, and user-triggered text or one-image publishing.
 
-Real LinkedIn publishing requires a backend and is out of scope for Phase 1.
+Multiple-image publishing and scheduled production publishing remain out of scope.

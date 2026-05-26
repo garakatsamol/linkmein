@@ -1,7 +1,7 @@
 <div class="page-actions">
   <div>
     <h2>Posts</h2>
-    <p>Manage local drafts for the Phase 1 sandbox.</p>
+    <p>Manage drafts for preview, sandbox publishing, and backend publishing.</p>
   </div>
   <a pButton routerLink="/composer" label="New draft" icon="pi pi-plus"></a>
 </div>
@@ -14,13 +14,13 @@
   <p-message severity="error" [text]="publishError" />
 }
 
-<p-message severity="info" text="Sandbox only - Not posted to LinkedIn. Drafts are stored only in this browser." />
+<p-message severity="info" text="Sandbox publish is not posted to LinkedIn. Real publishing happens from the preview page in API mode." />
 
 @if (drafts$ | async; as drafts) {
   @if (drafts.length === 0) {
       <p-card styleClass="empty-state">
         <ng-template pTemplate="title">No drafts yet</ng-template>
-      <p>Create your first local draft to start shaping a post. Drafts are stored only in this browser.</p>
+      <p>Create your first draft to start shaping a LinkedIn post.</p>
       <a pButton routerLink="/composer" label="Create draft" icon="pi pi-plus"></a>
     </p-card>
   } @else {

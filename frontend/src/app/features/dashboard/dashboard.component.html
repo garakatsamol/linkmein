@@ -1,7 +1,7 @@
 <div class="page-actions">
   <div>
     <h2>Dashboard</h2>
-    <p>Local planning overview for the Phase 1 sandbox.</p>
+    <p>Planning overview for drafts, previews, and publishing readiness.</p>
   </div>
   <div class="action-group">
     <a pButton routerLink="/composer" label="New draft" icon="pi pi-plus"></a>
@@ -13,12 +13,12 @@
 
 <p-message
   severity="info"
-  text="Phase 1 is local-only. Drafts are stored only in this browser; clearing browser storage may remove them."
+  text="LocalStorage mode stores drafts only in this browser; clearing browser storage may remove them. API mode stores drafts in the backend."
 />
 
 <p-message
   severity="secondary"
-  text="Sandbox publish is not posted to LinkedIn. Cloud storage and database persistence require a future backend."
+  text="Sandbox publish is not posted to LinkedIn. Real LinkedIn publishing is user-triggered and requires backend API mode plus a LinkedIn connection."
 />
 
 @if (view$ | async; as view) {
@@ -42,7 +42,7 @@
 
     @if (view.featuredPosts.length === 0) {
       <div class="empty-state">
-        <p>No drafts yet. Start with a local draft, then preview and sandbox publish it when ready.</p>
+        <p>No drafts yet. Start with a draft, then preview, sandbox publish, or publish through the backend when ready.</p>
         <a pButton routerLink="/composer" label="Create draft" icon="pi pi-plus"></a>
       </div>
     } @else {

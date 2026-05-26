@@ -10,8 +10,14 @@ npm start
 
 ## Backend
 
-No backend is implemented in Phase 1.
+```powershell
+cd backend
+dotnet build LinkMeIn.Backend.sln
+dotnet run --project LinkMeIn.Api
+```
+
+Use backend API mode in the frontend only when you want to test server-backed posts, media, LinkedIn OAuth, AI Assist, or user-triggered LinkedIn publishing.
 
 ## Manual Testing
 
-Use [manual-test-checklist.md](manual-test-checklist.md) for the Phase 1 manual QA pass.
+Use [manual-test-checklist.md](manual-test-checklist.md) for the current manual QA pass.

@@ -1,6 +1,6 @@
 # Manual Test Checklist
 
-Use this checklist for the Phase 1 Angular MVP.
+Use this checklist for the current LinkMeIn MVP.
 
 ## Drafts
 
@@ -50,11 +50,11 @@ Use this checklist for the Phase 1 Angular MVP.
 - Confirm quick actions navigate to Composer, Posts, Calendar, and LinkedIn settings.
 - Confirm recent/upcoming post actions open Preview and Edit.
 
-## LinkedIn Settings Placeholder
+## LinkedIn Settings
 
 - Open `/linkedin`.
-- Confirm the page states LinkedIn connection is not implemented in Phase 1.
-- Confirm it states real publishing requires a backend.
-- Confirm it states Angular must not store LinkedIn secrets.
-- Confirm `Connect LinkedIn` is disabled.
-- Confirm production publishing is disabled.
+- Confirm the page states OAuth and token storage are backend-only.
+- Confirm Angular does not expose LinkedIn secrets or tokens.
+- Confirm `Connect LinkedIn` starts the backend OAuth flow when disconnected.
+- Confirm the publishing status says text and one image are supported.
+- Confirm multiple images and scheduled publishing are shown as not implemented.

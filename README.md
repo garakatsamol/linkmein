@@ -1,32 +1,31 @@
 # LinkMeIn
 
-LinkMeIn is a personal LinkedIn post calendar and publishing assistant. Phase 1 is an Angular-only MVP focused on local drafting, planning, previewing, and sandbox publishing.
+LinkMeIn is a personal LinkedIn post planning, drafting, and publishing assistant. It supports local-first drafting plus an optional backend API mode for LinkedIn connection and user-triggered publishing.
 
-## Phase 1 Capabilities
+## Current Capabilities
 
 - Dashboard metrics for local drafts.
 - Post list with create, edit, preview, delete, and sandbox publish actions.
-- Post composer with Reactive Forms validation.
-- Multiple local image previews per draft.
+- Post composer with Reactive Forms validation, AI Assist, and one optional image per post.
 - LinkedIn-style sandbox preview without official LinkedIn branding.
 - Month calendar and upcoming scheduled posts list.
 - Local draft storage in browser `localStorage`.
-- LinkedIn settings placeholder explaining the future backend boundary.
+- Optional backend API mode for saved posts and media.
+- Backend-only LinkedIn OAuth.
+- User-triggered LinkedIn publishing for text-only posts and posts with one image.
+- Appearance settings for light, dark, and purple accent modes.
 
-## Sandbox Only
+## Sandbox And Real Publishing
 
 Sandbox publish updates local draft status to `mock-published` and stores a local timestamp. It is not posted to LinkedIn.
 
-Drafts and images are stored only in this browser. Clearing browser storage may remove drafts. Cloud storage and database persistence are future backend work.
+Real LinkedIn publishing is available from the preview page when using backend API mode with an active LinkedIn connection. Angular never receives LinkedIn client secrets or access tokens.
+
+LocalStorage mode stores drafts and images only in this browser. Clearing browser storage may remove drafts.
 
 ## Not Implemented Yet
 
-- LinkedIn OAuth.
-- Real LinkedIn publishing.
-- LinkedIn API calls.
-- Backend API.
-- Database/cloud storage.
-- Media upload to LinkedIn.
+- Multiple-image publishing.
 - Scheduled production publishing.
 - Feed, contact, or connection reading.
 - Auto-like, auto-comment, auto-connect, auto-DM, scraping, or browser automation.
