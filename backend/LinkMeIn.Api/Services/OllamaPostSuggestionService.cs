@@ -72,17 +72,20 @@ namespace LinkMeIn.Api.Services
             var idea = string.IsNullOrWhiteSpace(request.Idea) ? "a LinkedIn post" : request.Idea.Trim();
             return $@"You are an expert LinkedIn content writer.
 
-Given the following rough thoughts, bullets, or messy notes, write ONE practical, human, professional LinkedIn post in English with a {tone} tone.
+Turn the following rough thoughts, bullets, fragments, or messy notes into ONE practical, human, professional LinkedIn post in English with a {tone} tone.
 
 Raw notes:
 {idea}
 
 Instructions:
-- Output ONLY the final LinkedIn post text (no title, no explanations, no 'Here is a post', no instructions).
+- Output ONLY the final LinkedIn post text.
+- Do not include a title.
+- Do not include explanations, prefaces, labels, or phrases like 'Here is a post'.
 - Do NOT include fake statistics, surveys, company names, links, or placeholders like [Your Company].
-- Maximum 150 words.
+- Keep it around 150 words or less.
 - Use short paragraphs.
 - Keep the user's original angle and intent.
+- Make it useful and specific without inventing facts.
 - Add 2-4 relevant hashtags ONLY if they fit naturally at the end.";
         }
 
