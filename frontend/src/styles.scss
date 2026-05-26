@@ -3,6 +3,9 @@
 
 html {
   font-size: 16px;
+  --linkmein-accent: #0a66c2;
+  --linkmein-accent-contrast: #ffffff;
+  --linkmein-accent-soft: rgba(10, 102, 194, 0.12);
 }
 
 body {
@@ -16,4 +19,92 @@ body {
 
 * {
   box-sizing: border-box;
+}
+
+a {
+  color: var(--linkmein-accent);
+}
+
+:is(input, textarea, select):focus {
+  border-color: var(--linkmein-accent);
+  box-shadow: 0 0 0 0.12rem var(--linkmein-accent-soft);
+  outline: 0;
+}
+
+html.linkmein-appearance-purple {
+  --linkmein-accent: #7c3aed;
+  --linkmein-accent-contrast: #ffffff;
+  --linkmein-accent-soft: rgba(124, 58, 237, 0.16);
+  --primary-color: #7c3aed;
+  --primary-contrast-color: #ffffff;
+  --p-primary-color: #7c3aed;
+  --p-primary-contrast-color: #ffffff;
+  --p-focus-ring-color: rgba(124, 58, 237, 0.28);
+  --p-button-primary-background: #7c3aed;
+  --p-button-primary-border-color: #7c3aed;
+  --p-button-primary-hover-background: #6d28d9;
+  --p-button-primary-hover-border-color: #6d28d9;
+  --p-button-primary-active-background: #5b21b6;
+  --p-button-primary-active-border-color: #5b21b6;
+  --p-highlight-background: rgba(124, 58, 237, 0.14);
+  --p-highlight-color: #4c1d95;
+}
+
+html.linkmein-appearance-dark {
+  color-scheme: dark;
+  --linkmein-accent: #60a5fa;
+  --linkmein-accent-contrast: #08111f;
+  --linkmein-accent-soft: rgba(96, 165, 250, 0.2);
+  --surface-ground: #0f172a;
+  --surface-card: #111827;
+  --surface-border: #334155;
+  --surface-hover: rgba(96, 165, 250, 0.14);
+  --text-color: #e5e7eb;
+  --text-color-secondary: #a7b0c0;
+  --primary-color: #60a5fa;
+  --primary-contrast-color: #08111f;
+  --p-primary-color: #60a5fa;
+  --p-primary-contrast-color: #08111f;
+  --p-focus-ring-color: rgba(96, 165, 250, 0.34);
+  --p-content-background: #111827;
+  --p-content-color: #e5e7eb;
+  --p-text-color: #e5e7eb;
+  --p-text-muted-color: #a7b0c0;
+  --p-surface-0: #111827;
+  --p-surface-50: #1f2937;
+  --p-surface-100: #243244;
+  --p-surface-200: #334155;
+  --p-surface-700: #d1d5db;
+  --p-card-background: #111827;
+  --p-card-color: #e5e7eb;
+  --p-panel-background: #111827;
+  --p-inputtext-background: #0f172a;
+  --p-inputtext-color: #e5e7eb;
+  --p-inputtext-border-color: #475569;
+  --p-textarea-background: #0f172a;
+  --p-textarea-color: #e5e7eb;
+  --p-textarea-border-color: #475569;
+  --p-button-primary-background: #60a5fa;
+  --p-button-primary-border-color: #60a5fa;
+  --p-button-primary-hover-background: #93c5fd;
+  --p-button-primary-hover-border-color: #93c5fd;
+  --p-highlight-background: rgba(96, 165, 250, 0.18);
+  --p-highlight-color: #dbeafe;
+}
+
+html.linkmein-appearance-purple .p-button:not(.p-button-secondary):not(.p-button-danger):not(.p-button-warn),
+html.linkmein-appearance-dark .p-button:not(.p-button-secondary):not(.p-button-danger):not(.p-button-warn) {
+  background: var(--linkmein-accent);
+  border-color: var(--linkmein-accent);
+  color: var(--linkmein-accent-contrast);
+}
+
+html.linkmein-appearance-purple .p-button:not(.p-button-secondary):not(.p-button-danger):not(.p-button-warn):enabled:hover {
+  background: #6d28d9;
+  border-color: #6d28d9;
+}
+
+html.linkmein-appearance-dark .p-button:not(.p-button-secondary):not(.p-button-danger):not(.p-button-warn):enabled:hover {
+  background: #93c5fd;
+  border-color: #93c5fd;
 }

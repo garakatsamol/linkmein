@@ -8,6 +8,7 @@ import { TagModule } from 'primeng/tag';
 import { finalize, take, timeout } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
+import { AppearanceMode, AppearanceService } from '../../core/appearance/appearance.service';
 import { ApiLinkedInStatus } from '../../core/api/models/api-linkedin-status.model';
 import { ApiLinkedInService } from '../../core/services/api-linkedin.service';
 import { resolveStorageMode, StorageMode, STORAGE_MODE_OVERRIDE_KEY } from '../../core/storage/storage-mode.config';
@@ -21,9 +22,11 @@ const LINKEDIN_STATUS_TIMEOUT_MS = 10000;
   styleUrl: './linkedin-settings.component.scss'
 })
 export class LinkedinSettingsComponent implements OnInit {
+  private readonly appearance = inject(AppearanceService);
   private readonly linkedInApi = inject(ApiLinkedInService);
   private readonly changeDetector = inject(ChangeDetectorRef);
 
+  protected appearanceMode = this.appearance.getCurrentAppearance();
   protected readonly configuredStorageMode = environment.storageMode;
   protected readonly effectiveStorageMode = resolveStorageMode(environment.storageMode);
   protected readonly storageModeOverride = this.getStorageModeOverride();
@@ -132,6 +135,20 @@ export class LinkedinSettingsComponent implements OnInit {
 
   protected isStorageModeActive(mode: StorageMode): boolean {
     return this.effectiveStorageMode === mode;
+  }
+
+  protected useAppearance(mode: AppearanceMode): void {
+    this.appearance.setAppearance(mode);
+    this.appearanceMode = mode;
+    this.refreshView();
+  }
+
+  protected isAppearanceActive(mode: AppearanceMode): boolean {
+    return this.appearanceMode === mode;
+  }
+
+  protected getAppearanceButtonSeverity(mode: AppearanceMode): 'secondary' | undefined {
+    return this.isAppearanceActive(mode) ? undefined : 'secondary';
   }
 
   protected getStorageButtonSeverity(mode: StorageMode): 'secondary' | 'warn' | undefined {

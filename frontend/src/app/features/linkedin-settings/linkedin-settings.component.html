@@ -5,7 +5,7 @@
 
 <p-message
   severity="info"
-  text="Current app mode: sandbox publishing only. Not posted to LinkedIn."
+  text="LinkedIn publishing is user-triggered from post preview pages. Sandbox publishing remains separate and is not posted to LinkedIn."
 />
 
 <div class="settings-grid">
@@ -81,20 +81,20 @@
         (click)="disconnectLinkedIn()"
       ></button>
     </div>
-    <p class="helper-copy">Real publishing is still disabled. This only manages the backend connection state.</p>
+    <p class="helper-copy">This connection is used by backend publishing. Angular never receives LinkedIn tokens.</p>
   </p-card>
 
   <p-card>
     <ng-template pTemplate="title">Production publishing</ng-template>
-    <ng-template pTemplate="subtitle">Backend required</ng-template>
+    <ng-template pTemplate="subtitle">Backend controlled</ng-template>
 
     <div class="status-row">
-      <span>Real publish action</span>
-      <p-tag value="Disabled" severity="secondary" />
+      <span>Publish action</span>
+      <p-tag value="Preview page" severity="success" />
     </div>
     <div class="status-row">
-      <span>Media upload</span>
-      <p-tag value="Disabled" severity="secondary" />
+      <span>Supported media</span>
+      <p-tag value="Text + one image" severity="success" />
     </div>
     <div class="status-row">
       <span>LinkedIn API access</span>
@@ -104,9 +104,53 @@
     <p-divider />
 
     <p>
-      Future backend work will handle LinkedIn OAuth, token storage, media upload, real publishing, scheduled publishing,
-      and publish audit logs.
+      The backend handles OAuth, token storage, text publishing, and one-image publishing. Multiple images and scheduled
+      publishing are not implemented.
     </p>
+  </p-card>
+
+  <p-card>
+    <ng-template pTemplate="title">Appearance</ng-template>
+    <ng-template pTemplate="subtitle">Local visual preference</ng-template>
+
+    <p class="helper-copy">Choose a lightweight app appearance. This is stored only in this browser.</p>
+
+    <div class="status-row">
+      <span>Current appearance</span>
+      <p-tag [value]="appearanceMode" severity="info" />
+    </div>
+
+    <p-divider />
+
+    <div class="settings-actions">
+      <button
+        pButton
+        type="button"
+        label="Light"
+        icon="pi pi-sun"
+        [severity]="getAppearanceButtonSeverity('light')"
+        [outlined]="!isAppearanceActive('light')"
+        (click)="useAppearance('light')"
+      ></button>
+      <button
+        pButton
+        type="button"
+        label="Dark"
+        icon="pi pi-moon"
+        [severity]="getAppearanceButtonSeverity('dark')"
+        [outlined]="!isAppearanceActive('dark')"
+        (click)="useAppearance('dark')"
+      ></button>
+      <button
+        pButton
+        type="button"
+        label="Purple accent"
+        icon="pi pi-sparkles"
+        [severity]="getAppearanceButtonSeverity('purple')"
+        [outlined]="!isAppearanceActive('purple')"
+        (click)="useAppearance('purple')"
+      ></button>
+    </div>
   </p-card>
 
   <p-card>
@@ -133,7 +177,7 @@
 
     <p-divider />
 
-    <div class="developer-actions">
+    <div class="settings-actions">
       <button
         pButton
         type="button"
