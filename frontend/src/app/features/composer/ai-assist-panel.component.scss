@@ -1,110 +1,134 @@
-// Spinner in button removed; no longer needed
 .ai-result-area {
-  margin-top: 1.5rem;
-  margin-bottom: 1.5rem;
-  display: flex;
-  flex-direction: column;
   align-items: stretch;
-}
-.ai-loading-group {
   display: flex;
   flex-direction: column;
+  margin: 1.5rem 0;
+}
+
+.ai-loading-group {
   align-items: center;
-  justify-content: center;
-  gap: 1.25rem;
-  min-height: 180px;
-  background: #f6f8fa;
-  border: 1px solid #e0e0e0;
+  background: var(--surface-card);
+  border: 1px solid var(--surface-border);
   border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  justify-content: center;
+  min-height: 180px;
   padding: 2rem 1rem;
 }
+
 .ai-loading-text {
+  color: var(--text-color-secondary);
   font-size: 1.1em;
-  color: #888;
   text-align: center;
 }
+
 .ai-suggestion-area {
+  background: var(--surface-card);
+  border: 1px solid var(--surface-border);
+  border-radius: 8px;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  background: #f6f8fa;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
-  padding: 1.5rem 1rem 1rem 1rem;
+  gap: 1rem;
+  padding: 1rem;
 }
+
 .ai-spinner-main {
   width: 2.5em !important;
   height: 2.5em !important;
 }
-.ai-loading-text {
-  font-size: 1.1em;
-  color: #888;
-}
+
 .ai-assist-card {
   margin-bottom: 1.5rem;
 }
+
 .ai-assist-header {
-  display: flex;
   align-items: center;
+  display: flex;
   gap: 0.5rem;
 }
+
 .ai-assist-title {
   font-size: 1.2rem;
   font-weight: 600;
 }
+
 .ai-assist-helper {
-  color: #6c757d;
+  color: var(--text-color-secondary);
   font-size: 0.95rem;
   margin-bottom: 1rem;
 }
+
 .ai-assist-fields {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
+
 .ai-assist-field {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
 }
+
 .ai-label {
   font-weight: 500;
   margin-bottom: 0.25rem;
 }
+
 .ai-textarea {
-  width: 100%;
   resize: vertical;
-}
-.ai-select {
   width: 100%;
-  padding: 0.5rem;
-  border-radius: 4px;
-  border: 1px solid #ced4da;
-  background: #fff;
 }
+
+.ai-select {
+  background: var(--surface-card);
+  border: 1px solid var(--surface-border);
+  border-radius: 0.375rem;
+  color: var(--text-color);
+  padding: 0.5rem;
+  width: 100%;
+}
+
 .ai-generate-btn {
   align-self: flex-end;
   min-width: 180px;
 }
-.ai-loading {
-  margin-top: 0.5rem;
-  color: #888;
-}
+
 .ai-error {
   margin-top: 0.5rem;
 }
-.ai-suggestion-area {
-  margin-top: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+
+.ai-result-header {
+  display: grid;
+  gap: 0.2rem;
 }
+
+.ai-result-header span {
+  color: var(--text-color-secondary);
+  font-size: 0.9rem;
+}
+
+.ai-suggestion-section {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.ai-suggestion-title {
+  background: var(--surface-ground);
+  border: 1px solid var(--surface-border);
+  border-left: 0.25rem solid var(--linkmein-accent, var(--primary-color));
+  border-radius: 0.5rem;
+  font-weight: 600;
+  padding: 0.75rem;
+}
+
 .ai-suggestion-text {
-  width: 100%;
   resize: vertical;
+  width: 100%;
 }
+
 .ai-use-btn {
   align-self: flex-end;
   min-width: 160px;

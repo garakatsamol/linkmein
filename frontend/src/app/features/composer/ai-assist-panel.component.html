@@ -27,9 +27,19 @@
     </ng-container>
     <ng-template #suggestionBlock>
       <div class="ai-suggestion-area">
-        <label class="ai-label">Suggested text</label>
-        <textarea pTextarea [value]="suggestion?.suggestedText" readonly rows="5" class="ai-suggestion-text"></textarea>
-        <button pButton type="button" label="Use this text" (click)="handleUseSuggestion()" class="ai-use-btn"></button>
+        <div class="ai-result-header">
+          <strong>Draft suggestion</strong>
+          <span>Review before applying it to the Composer.</span>
+        </div>
+        <div *ngIf="suggestion?.suggestedTitle" class="ai-suggestion-section">
+          <label class="ai-label">Suggested title</label>
+          <div class="ai-suggestion-title">{{ suggestion?.suggestedTitle }}</div>
+        </div>
+        <div class="ai-suggestion-section">
+          <label class="ai-label">Suggested post</label>
+          <textarea pTextarea [value]="suggestion?.suggestedText" readonly rows="6" class="ai-suggestion-text"></textarea>
+        </div>
+        <button pButton type="button" label="Use this draft" (click)="handleUseSuggestion()" class="ai-use-btn"></button>
       </div>
     </ng-template>
   </div>

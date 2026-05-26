@@ -6,7 +6,7 @@ import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { TextareaModule } from 'primeng/textarea';
-import { AiAssistPanelComponent } from './ai-assist-panel.component';
+import { AiAssistPanelComponent, AiSuggestionSelection } from './ai-assist-panel.component';
 import { finalize, take, timeout } from 'rxjs';
 
 import { DraftImage } from '../../core/models/draft-image.model';
@@ -26,20 +26,17 @@ const SAVE_TIMEOUT_MS = 60000;
   styleUrl: './post-composer.component.scss'
 })
 export class PostComposerComponent implements OnInit {
-  // Called when AI Assist panel emits a suggestion to use
-  protected handleUseAiSuggestion(text: string): void {
-    this.form.controls.content.setValue(text);
+  protected handleUseAiSuggestion(selection: AiSuggestionSelection): void {
+    this.form.controls.content.setValue(selection.suggestedText);
     this.form.controls.content.markAsDirty();
     this.form.controls.content.markAsTouched();
-    // Auto-fill title if empty
+
     const currentTitle = this.form.controls.title.value?.trim();
     if (!currentTitle) {
-      // Use first non-empty line of suggested text as fallback title
-      const firstLine = text.split('\n').map(l => l.trim()).find(l => l.length > 0) || '';
-      // Truncate to 100 chars (adjust if your title max length differs)
-      const truncated = firstLine.slice(0, 100);
-      if (truncated) {
-        this.form.controls.title.setValue(truncated);
+      const suggestedTitle = selection.suggestedTitle?.trim() || this.getFallbackTitle(selection.suggestedText);
+
+      if (suggestedTitle) {
+        this.form.controls.title.setValue(suggestedTitle);
         this.form.controls.title.markAsDirty();
         this.form.controls.title.markAsTouched();
         this.form.controls.title.updateValueAndValidity();
@@ -48,6 +45,7 @@ export class PostComposerComponent implements OnInit {
     this.form.controls.content.updateValueAndValidity();
     this.refreshView();
   }
+
   private readonly draftStore = inject(DraftStoreService);
   private readonly formBuilder = inject(FormBuilder);
   private readonly imagePreview = inject(ImagePreviewService);
@@ -207,6 +205,15 @@ export class PostComposerComponent implements OnInit {
   private finishSaving(): void {
     this.isSaving = false;
     this.refreshView();
+  }
+
+  private getFallbackTitle(text: string): string {
+    const firstLine = text
+      .split('\n')
+      .map((line) => line.trim())
+      .find((line) => line.length > 0);
+
+    return firstLine?.slice(0, 100) ?? '';
   }
 
   private isLocalImage(image: DraftImage): boolean {

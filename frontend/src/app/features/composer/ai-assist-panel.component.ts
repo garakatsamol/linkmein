@@ -9,6 +9,11 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ApiAiService, GeneratePostSuggestionRequest, GeneratePostSuggestionResponse } from '../../core/services/api-ai.service';
 import { finalize } from 'rxjs/operators';
 
+export interface AiSuggestionSelection {
+  suggestedTitle?: string;
+  suggestedText: string;
+}
+
 @Component({
   selector: 'app-ai-assist-panel',
   standalone: true,
@@ -29,7 +34,7 @@ export class AiAssistPanelComponent {
   error = '';
   suggestion: GeneratePostSuggestionResponse | null = null;
 
-  @Output() useSuggestion = new EventEmitter<string>();
+  @Output() useSuggestion = new EventEmitter<AiSuggestionSelection>();
 
   constructor(
     private readonly aiService: ApiAiService,
@@ -70,7 +75,10 @@ export class AiAssistPanelComponent {
 
   handleUseSuggestion() {
     if (this.suggestion?.suggestedText) {
-      this.useSuggestion.emit(this.suggestion.suggestedText);
+      this.useSuggestion.emit({
+        suggestedTitle: this.suggestion.suggestedTitle,
+        suggestedText: this.suggestion.suggestedText
+      });
     }
   }
 }

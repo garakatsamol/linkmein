@@ -10,6 +10,7 @@ export interface GeneratePostSuggestionRequest {
 }
 
 export interface GeneratePostSuggestionResponse {
+  suggestedTitle?: string;
   suggestedText: string;
   message?: string;
 }
